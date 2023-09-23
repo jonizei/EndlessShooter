@@ -21,9 +21,10 @@ int projectileCount = 0;
 int projectileId = 1;
 
 // PRIVATE FUNCTION DECLARATIONS
-void AddToPool(Projectile* projectile);
-void RemoveFromPool(int id);
+void AddToProjectilePool(Projectile* projectile);
+void RemoveFromProjectilePool(int id);
 void FreeBullets();
+void EnemyCollisionWithBullet(Enemy* enemy, Projectile* bullet);
 
 // PUBLIC FUNCTIONS
 
@@ -87,13 +88,14 @@ void ShootPlayer(Player* player)
                 , 10
                 , player->weapon->speed
                 , 0
+                , 10
             );
 
 
             bullet->id = projectileId;
             bullet->direction = GetMouseDirection(bullet->transform.position);
 
-            AddToPool(bullet);
+            AddToProjectilePool(bullet);
             projectileId++;
 
             player->weapon->lashShot = GetTime();
@@ -111,7 +113,7 @@ void MoveBullets(int screenWidth, int screenHeight)
 
             if (!ContainsPosition(projectilePool[i]->transform.position, screenWidth, screenHeight)) 
             {
-                RemoveFromPool(projectilePool[i]->id);
+                RemoveFromProjectilePool(projectilePool[i]->id);
             }
         }
     }
@@ -128,9 +130,40 @@ void DrawBullets()
     }
 }
 
+bool IsEnemyCollidingWithBullet(Enemy* enemy)
+{
+    bool collides = false;
+    for (int i = 0; i < MAX_PROJECTILE; i++)
+    {
+        if (projectilePool[i] != NULL)
+        {
+            collides = IsCollision(projectilePool[i]->transform, enemy->transform);
+
+            if (collides) 
+            {
+                RemoveFromProjectilePool(projectilePool[i]->id);
+                break;
+            }
+        }
+    }
+
+    return collides;
+}
+
+void CheckEnemyCollisionWithBullets(Enemy* enemy)
+{
+    for (int i = 0; i < MAX_PROJECTILE; i++)
+    {
+        if (projectilePool[i] != NULL)
+        {
+            EnemyCollisionWithBullet(enemy, projectilePool[i]);
+        }
+    }
+}
+
 // PRIVATE FUNCTIONS
 
-void AddToPool(Projectile* projectile)
+void AddToProjectilePool(Projectile* projectile)
 {
     for(int i = 0; i < MAX_PROJECTILE; i++)
     {
@@ -143,7 +176,7 @@ void AddToPool(Projectile* projectile)
     }
 }
 
-void RemoveFromPool(int id)
+void RemoveFromProjectilePool(int id)
 {
     for(int i = 0; i < MAX_PROJECTILE; i++)
     {
@@ -165,5 +198,16 @@ void FreeBullets()
     for (int i = 0; i < MAX_PROJECTILE; i++)
     {
         FreeProjectile(projectilePool[i]);
+    }
+}
+
+void EnemyCollisionWithBullet(Enemy* enemy, Projectile* bullet)
+{
+    bool collides = IsCollision(bullet->transform, enemy->transform);
+
+    if (collides)
+    {
+        enemy->health -= bullet->damage;
+        RemoveFromProjectilePool(bullet->id);
     }
 }

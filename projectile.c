@@ -6,7 +6,7 @@
 
 // PUBLIC FUNCTIONS
 
-Projectile* CreateProjectile(int x, int y, int width, int height, double speed, double direction)
+Projectile* CreateProjectile(int x, int y, int width, int height, double speed, double direction, double damage)
 {
     Projectile* p = malloc(sizeof(Projectile));
     p->id = -1;
@@ -16,6 +16,7 @@ Projectile* CreateProjectile(int x, int y, int width, int height, double speed, 
     p->transform.size.y = height;
     p->movementSpeed = speed;
     p->direction = 0;
+    p->damage = damage;
 
     return p;
 }

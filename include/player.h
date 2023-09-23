@@ -5,6 +5,7 @@
 #include<stdlib.h>
 #include "utils.h"
 #include "weapon.h"
+#include "enemy.h"
 
 typedef struct _player {
     Transform2D transform;
@@ -19,5 +20,6 @@ void DrawPlayer(Player* player);
 void ShootPlayer(Player* player);
 void MoveBullets(int screenWidth, int screenHeight);
 void DrawBullets();
+void CheckEnemyCollisionWithBullets(Enemy* enemy);
 
 #endif

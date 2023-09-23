@@ -1,18 +1,25 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
+#include<stdbool.h>
+#include "projectile.h"
 #include "utils.h"
 
+typedef enum {
+    ENEMY_RAT
+} EnemyType;
+
 typedef struct _enemy {
+    int id;
+    EnemyType type;
     Transform2D transform;
+    int health;
 } Enemy;
 
-typedef struct _rat_enemy {
-    Enemy* parent;
-} RatEnemy;
-
-RatEnemy* CreateRatEnemy(int x, int y);
+// GENERAL ENEMY
+Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y);
 void DrawEnemy(Enemy* enemy);
-void FreeRatEnemy(RatEnemy* rat);
+void FreeEnemy(Enemy* enemy);
+bool IsEnemyAlive(Enemy* enemy);
 
 #endif

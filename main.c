@@ -1,6 +1,7 @@
 #include "include/raylib.h"
 #include "include/player.h"
 #include "include/enemy.h"
+#include "include/enemy_handler.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 680
@@ -14,25 +15,29 @@ int main()
 
     // Create player
     Player* player = CreatePlayer(100, 100);
-    RatEnemy* ratEnemy = CreateRatEnemy(300, 300);
+    EnemySpawner* ratSpawner = CreateEnemySpawer(ENEMY_RAT, 3, 100, 350, 350);
 
     while(!WindowShouldClose())
     {
         MovePlayer(player);
         ShootPlayer(player);
         MoveBullets(SCREEN_WIDTH, SCREEN_HEIGHT);
+        CheckEnemyCollision();
+        UpdateEnemies();
+        UpdateSpawner(ratSpawner);
 
         BeginDrawing();
 
             ClearBackground(WHITE);
             DrawPlayer(player);
-            DrawEnemy(ratEnemy->parent);
+            DrawEnemies();
             DrawBullets();
 
         EndDrawing();
     }
 
-    FreeRatEnemy(ratEnemy);
+    FreeEnemySpawner(ratSpawner);
+    FreeEnemies();
     FreePlayer(player);
 
     return 0;
