@@ -57,7 +57,7 @@ void UpdateEnemies()
         {
             if (IsEnemyAlive(enemyPool[i]))
             {
-                
+                UpdateEnemy(enemyPool[i]);
             }
             else 
             {

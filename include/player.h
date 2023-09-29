@@ -9,7 +9,7 @@
 
 typedef struct _player {
     Transform2D transform;
-    double movementSpeed;
+    float movementSpeed;
     Weapon* weapon;
 } Player;
 
@@ -18,8 +18,9 @@ void FreePlayer(Player* player);
 void MovePlayer(Player* player);
 void DrawPlayer(Player* player);
 void ShootPlayer(Player* player);
-void MoveBullets(int screenWidth, int screenHeight);
+void MoveBullets();
 void DrawBullets();
 void CheckEnemyCollisionWithBullets(Enemy* enemy);
+Player* GetPlayer();
 
 #endif

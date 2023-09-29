@@ -2,6 +2,7 @@
 #define ENEMY_HANDLER_H
 
 #include "enemy.h"
+#include "player.h"
 
 typedef struct _enemy_spawner {
     Transform2D transform;

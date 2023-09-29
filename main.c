@@ -9,7 +9,7 @@
 
 int main() 
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "PlayerMechanics");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "EndlessShooter");
 
     SetTargetFPS(FPS);
 

@@ -19,6 +19,7 @@ const double MOVEMENT_SPEED = 5.0;
 Projectile* projectilePool[MAX_PROJECTILE];
 int projectileCount = 0;
 int projectileId = 1;
+Player* playerRef = NULL;
 
 // PRIVATE FUNCTION DECLARATIONS
 void AddToProjectilePool(Projectile* projectile);
@@ -38,6 +39,9 @@ Player* CreatePlayer(int x, int y)
     p->movementSpeed = MOVEMENT_SPEED;
 
     p->weapon = CreateWeapon();
+
+    free(playerRef);
+    playerRef = p;
 
     return p;
 }
@@ -103,7 +107,7 @@ void ShootPlayer(Player* player)
     }
 }
 
-void MoveBullets(int screenWidth, int screenHeight)
+void MoveBullets()
 {
     for (int i = 0; i < MAX_PROJECTILE; i++)
     {
@@ -111,7 +115,7 @@ void MoveBullets(int screenWidth, int screenHeight)
         {
             MoveProjectile(projectilePool[i]);
 
-            if (!ContainsPosition(projectilePool[i]->transform.position, screenWidth, screenHeight)) 
+            if (!ContainsPosition(projectilePool[i]->transform.position, GetScreenWidth(), GetScreenHeight())) 
             {
                 RemoveFromProjectilePool(projectilePool[i]->id);
             }
@@ -159,6 +163,11 @@ void CheckEnemyCollisionWithBullets(Enemy* enemy)
             EnemyCollisionWithBullet(enemy, projectilePool[i]);
         }
     }
+}
+
+Player* GetPlayer()
+{
+    return playerRef;
 }
 
 // PRIVATE FUNCTIONS
