@@ -1,11 +1,24 @@
 #include "include/utils.h"
 #include<math.h>
 
+// GLOBAL VARIABLES
+Camera2D* cameraRef;
+
 // PRIVATE FUNCTION DECLARATIONS
 
 bool IsOverlap(int aLeft, int aRight, int bLeft, int bRight);
 
 // PUBLIC FUNCTIONS
+
+void SetCamera(Camera2D* camera)
+{
+    cameraRef = camera;
+}
+
+Camera2D* GetCamera()
+{
+    return cameraRef;
+}
 
 bool IsCollision(Transform2D a, Transform2D b)
 {
@@ -22,9 +35,14 @@ void MyFree(void** ptr)
     *ptr = NULL;
 }
 
-double GetMouseDirection(Vector2 position)
+Vector2 GetLocalMousePosition()
 {
-    Vector2 mousePosition = GetMousePosition();
+    return GetScreenToWorld2D(GetMousePosition(), *GetCamera());
+}
+
+float GetMouseDirection(Vector2 position)
+{
+    Vector2 mousePosition = GetLocalMousePosition();
     return atan2(mousePosition.y - position.y, mousePosition.x - position.x);
 }
 

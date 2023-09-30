@@ -2,6 +2,7 @@
 #include "include/player.h"
 #include "include/enemy.h"
 #include "include/enemy_handler.h"
+#include "include/utils.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 680
@@ -25,6 +26,8 @@ int main()
     camera.offset = (Vector2){ SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f };
     camera.rotation = 0.0f;
     camera.zoom = 2.0f;
+
+    SetCamera(&camera);
 
     while(!WindowShouldClose())
     {

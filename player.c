@@ -15,6 +15,8 @@ const int BUTTON_RIGHT = KEY_D;
 const int HEIGHT = 16;
 const int WIDTH = 16;
 const double MOVEMENT_SPEED = 5.0;
+const int BULLET_HEIGHT = 10;
+const int BULLET_WIDTH = 10;
 
 // GLOBAL VARIBLES
 Projectile* projectilePool[MAX_PROJECTILE];
@@ -110,15 +112,15 @@ void ShootPlayer(Player* player)
                 LoadTextureFromImage(bulletImage)
                 , player->transform.position.x
                 , player->transform.position.y
-                , 8
-                , 8
+                , BULLET_WIDTH
+                , BULLET_HEIGHT
                 , player->weapon->speed
                 , 0
             );
 
             bullet->id = projectileId;
             bullet->direction = GetMouseDirection(bullet->transform.position);
-            bullet->angle = 180 + Vector2Angle(player->transform.position, GetMousePosition());
+            bullet->angle = 180 + Vector2Angle(player->transform.position, GetLocalMousePosition());
             bullet->damage = 10;
 
             AddToProjectilePool(bullet);

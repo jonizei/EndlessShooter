@@ -13,8 +13,11 @@ typedef struct _transform2d {
     float scale;
 } Transform2D;
 
+void SetCamera(Camera2D* camera);
+Camera2D* GetCamera();
 void MyFree(void** ptr);
-double GetMouseDirection(Vector2 position);
+Vector2 GetLocalMousePosition();
+float GetMouseDirection(Vector2 position);
 bool ContainsPosition(Vector2 position, int screenWidth, int screenHeight);
 bool IsCollision(Transform2D a, Transform2D b);
 
