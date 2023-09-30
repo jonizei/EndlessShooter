@@ -10,6 +10,7 @@
 typedef struct _transform2d {
     Vector2 position;
     Vector2 size;
+    float scale;
 } Transform2D;
 
 void MyFree(void** ptr);

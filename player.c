@@ -46,6 +46,8 @@ void UnloadPlayerResources()
 
 Player* CreatePlayer(int x, int y)
 {
+    float playerArea = WIDTH * HEIGHT;
+
     Player* p = malloc(sizeof(Player));
     p->transform.position.x = x;
     p->transform.position.y = y;
@@ -54,6 +56,9 @@ Player* CreatePlayer(int x, int y)
     p->movementSpeed = MOVEMENT_SPEED;
     p->texture = LoadTextureFromImage(playerImage);
     p->weapon = CreateWeapon();
+
+    float textureArea = p->texture.height * p->texture.width;
+    p->transform.scale = playerArea / textureArea;
 
     free(playerRef);
     playerRef = p;
@@ -92,7 +97,7 @@ void MovePlayer(Player* player)
 
 void DrawPlayer(Player* player)
 {
-    DrawTexture(player->texture, player->transform.position.x, player->transform.position.y, WHITE);
+    DrawTextureEx(player->texture, player->transform.position, 0, player->transform.scale, WHITE);
 }
 
 void ShootPlayer(Player* player)
@@ -105,8 +110,8 @@ void ShootPlayer(Player* player)
                 LoadTextureFromImage(bulletImage)
                 , player->transform.position.x
                 , player->transform.position.y
-                , 16
-                , 16
+                , 8
+                , 8
                 , player->weapon->speed
                 , 0
             );

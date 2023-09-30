@@ -55,6 +55,9 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
 
     }
 
+    float enemyArea = width * height;
+    float textureArea = texture.height * texture.width;
+
     Enemy* enemy = CreateEnemy(id, x, y, width, height);
     enemy->type = type;
     enemy->health = health;
@@ -65,13 +68,14 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
     enemy->wanderRadius = wanderRadius;
     enemy->wanderTargetTime = wanderTargetTime;
     enemy->texture = texture;
+    enemy->transform.scale = enemyArea / textureArea;
 
     return enemy;
 }
 
 void DrawEnemy(Enemy* enemy)
 {
-    DrawTexture(enemy->texture, enemy->transform.position.x, enemy->transform.position.y, WHITE);
+    DrawTextureEx(enemy->texture, enemy->transform.position, 0, enemy->transform.scale, WHITE);
 }
 
 void FreeEnemy(Enemy* enemy)
