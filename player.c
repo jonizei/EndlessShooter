@@ -27,6 +27,10 @@ Image playerImage;
 Image bulletImage;
 
 // PRIVATE FUNCTION DECLARATIONS
+void MovePlayer(Player* player);
+void ShootPlayer(Player* player);
+void MoveBullets();
+void MoveWeapon(Player* player);
 void AddToProjectilePool(Projectile* projectile);
 void RemoveFromProjectilePool(int id);
 void FreeBullets();
@@ -58,6 +62,7 @@ Player* CreatePlayer(int x, int y)
     p->movementSpeed = MOVEMENT_SPEED;
     p->texture = LoadTextureFromImage(playerImage);
     p->weapon = CreateWeapon();
+    p->weapon->offset = WIDTH;
 
     float textureArea = p->texture.height * p->texture.width;
     p->transform.scale = playerArea / textureArea;
@@ -76,75 +81,17 @@ void FreePlayer(Player* player)
     MyFree(&player);
 }
 
-void MovePlayer(Player* player)
+void UpdatePlayer(Player* player)
 {
-    if (IsKeyDown(BUTTON_UP))
-    {
-        player->transform.position.y -= player->movementSpeed;
-    }
-    else if (IsKeyDown(BUTTON_DOWN))
-    {
-        player->transform.position.y += player->movementSpeed;
-    }
-
-    if (IsKeyDown(BUTTON_LEFT))
-    {
-        player->transform.position.x -= player->movementSpeed;
-    }
-    else if (IsKeyDown(BUTTON_RIGHT))
-    {
-        player->transform.position.x += player->movementSpeed;
-    }
+    MovePlayer(player);
+    ShootPlayer(player);
+    MoveBullets();
+    MoveWeapon(player);
 }
 
 void DrawPlayer(Player* player)
 {
     DrawTextureEx(player->texture, player->transform.position, 0, player->transform.scale, WHITE);
-}
-
-void ShootPlayer(Player* player)
-{
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && projectileCount + 1 < MAX_PROJECTILE)
-    {
-        if (GetTime() - player->weapon->lashShot > player->weapon->attackSpeed)
-        {
-            Projectile* bullet = CreateProjectile(
-                LoadTextureFromImage(bulletImage)
-                , player->transform.position.x
-                , player->transform.position.y
-                , BULLET_WIDTH
-                , BULLET_HEIGHT
-                , player->weapon->speed
-                , 0
-            );
-
-            bullet->id = projectileId;
-            bullet->direction = GetMouseDirection(bullet->transform.position);
-            bullet->angle = 180 + Vector2Angle(player->transform.position, GetLocalMousePosition());
-            bullet->damage = 10;
-
-            AddToProjectilePool(bullet);
-            projectileId++;
-
-            player->weapon->lashShot = GetTime();
-        }
-    }
-}
-
-void MoveBullets()
-{
-    for (int i = 0; i < MAX_PROJECTILE; i++)
-    {
-        if (projectilePool[i] != NULL) 
-        {
-            MoveProjectile(projectilePool[i]);
-
-            if (!ContainsPosition(projectilePool[i]->transform.position, GetScreenWidth(), GetScreenHeight())) 
-            {
-                RemoveFromProjectilePool(projectilePool[i]->id);
-            }
-        }
-    }
 }
 
 void DrawBullets()
@@ -195,6 +142,84 @@ Player* GetPlayer()
 }
 
 // PRIVATE FUNCTIONS
+
+void MovePlayer(Player* player)
+{
+    if (IsKeyDown(BUTTON_UP))
+    {
+        player->transform.position.y -= player->movementSpeed;
+    }
+    else if (IsKeyDown(BUTTON_DOWN))
+    {
+        player->transform.position.y += player->movementSpeed;
+    }
+
+    if (IsKeyDown(BUTTON_LEFT))
+    {
+        player->transform.position.x -= player->movementSpeed;
+    }
+    else if (IsKeyDown(BUTTON_RIGHT))
+    {
+        player->transform.position.x += player->movementSpeed;
+    }
+}
+
+void ShootPlayer(Player* player)
+{
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && projectileCount + 1 < MAX_PROJECTILE)
+    {
+        if (GetTime() - player->weapon->lastShot > player->weapon->attackSpeed)
+        {
+            Projectile* bullet = CreateProjectile(
+                LoadTextureFromImage(bulletImage)
+                , player->weapon->transform.position.x
+                , player->weapon->transform.position.y
+                , BULLET_WIDTH
+                , BULLET_HEIGHT
+                , player->weapon->speed
+                , 0
+            );
+
+            bullet->id = projectileId;
+            bullet->direction = GetMouseDirection(bullet->transform.position);
+            bullet->angle = 180 + Vector2Angle(player->weapon->transform.position, GetLocalMousePosition());
+            bullet->damage = 10;
+
+            AddToProjectilePool(bullet);
+            projectileId++;
+
+            player->weapon->lastShot = GetTime();
+        }
+    }
+}
+
+void MoveBullets()
+{
+    for (int i = 0; i < MAX_PROJECTILE; i++)
+    {
+        if (projectilePool[i] != NULL) 
+        {
+            MoveProjectile(projectilePool[i]);
+
+            if (!ContainsPosition(projectilePool[i]->transform.position, GetScreenWidth(), GetScreenHeight())) 
+            {
+                RemoveFromProjectilePool(projectilePool[i]->id);
+            }
+        }
+    }
+}
+
+void MoveWeapon(Player* player)
+{
+    Vector2 playerOrigin = {
+        player->transform.position.x + player->transform.size.x / 2,
+        player->transform.position.y + player->transform.size.y / 2
+    };
+
+    float direction = GetMouseDirection(playerOrigin);
+    Vector2 position = GetPositionInDistance(playerOrigin, player->weapon->offset, direction);
+    player->weapon->transform.position = position;
+}
 
 void AddToProjectilePool(Projectile* projectile)
 {

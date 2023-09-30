@@ -6,9 +6,10 @@
 Weapon* CreateWeapon()
 {
     Weapon* w = malloc(sizeof(Weapon));
-    w->speed = 10;
+    w->speed = 3;
     w->attackSpeed = 0.1;
-    w->lashShot = 0;
+    w->lastShot = 0;
+    w->offset = 0;
 
     return w;
 }

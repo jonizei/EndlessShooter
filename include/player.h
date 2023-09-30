@@ -16,10 +16,8 @@ typedef struct _player {
 
 Player* CreatePlayer(int x, int y);
 void FreePlayer(Player* player);
-void MovePlayer(Player* player);
+void UpdatePlayer(Player* player);
 void DrawPlayer(Player* player);
-void ShootPlayer(Player* player);
-void MoveBullets();
 void DrawBullets();
 void CheckEnemyCollisionWithBullets(Enemy* enemy);
 Player* GetPlayer();

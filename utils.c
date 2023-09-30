@@ -2,7 +2,7 @@
 #include<math.h>
 
 // GLOBAL VARIABLES
-Camera2D* cameraRef;
+Camera2D* cameraRef = NULL;
 
 // PRIVATE FUNCTION DECLARATIONS
 
@@ -44,6 +44,13 @@ float GetMouseDirection(Vector2 position)
 {
     Vector2 mousePosition = GetLocalMousePosition();
     return atan2(mousePosition.y - position.y, mousePosition.x - position.x);
+}
+
+Vector2 GetPositionInDistance(Vector2 position, float distance, float direction)
+{
+    float x = position.x + cos(direction) * distance;
+    float y = position.y + sin(direction) * distance;
+    return (Vector2){ x, y };
 }
 
 bool ContainsPosition(Vector2 position, int screenWidth, int screenHeight)

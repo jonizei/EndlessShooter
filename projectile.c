@@ -35,8 +35,11 @@ void FreeProjectile(Projectile* projectile)
 
 void MoveProjectile(Projectile* projectile)
 {
+    Vector2 movement = GetPositionInDistance(projectile->transform.position, projectile->movementSpeed, projectile->direction);
     projectile->transform.position.x += projectile->movementSpeed * cos(projectile->direction);
     projectile->transform.position.y += projectile->movementSpeed * sin(projectile->direction); 
+
+    projectile->transform.position = movement;
 }
 
 void DrawProjectile(Projectile* projectile)

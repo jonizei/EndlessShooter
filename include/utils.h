@@ -18,6 +18,7 @@ Camera2D* GetCamera();
 void MyFree(void** ptr);
 Vector2 GetLocalMousePosition();
 float GetMouseDirection(Vector2 position);
+Vector2 GetPositionInDistance(Vector2 position, float distance, float direction);
 bool ContainsPosition(Vector2 position, int screenWidth, int screenHeight);
 bool IsCollision(Transform2D a, Transform2D b);
 

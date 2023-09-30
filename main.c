@@ -32,8 +32,7 @@ int main()
     while(!WindowShouldClose())
     {
         camera.target = (Vector2){ player->transform.position.x + 20.0f, player->transform.position.y + 20.0f };
-        MovePlayer(player);
-        ShootPlayer(player);
+        UpdatePlayer(player);
         MoveBullets(SCREEN_WIDTH, SCREEN_HEIGHT);
         CheckEnemyCollision();
         UpdateEnemies();

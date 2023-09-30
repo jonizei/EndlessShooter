@@ -7,9 +7,10 @@
 
 typedef struct _weapon {
     Transform2D transform;
-    double speed;
-    double attackSpeed;
-    double lashShot;
+    float offset;
+    float speed;
+    float attackSpeed;
+    float lastShot;
 } Weapon;
 
 Weapon* CreateWeapon();
