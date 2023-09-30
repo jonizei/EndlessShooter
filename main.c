@@ -13,6 +13,9 @@ int main()
 
     SetTargetFPS(FPS);
 
+    LoadPlayerResources();
+    LoadEnemyResources();
+
     // Create player
     Player* player = CreatePlayer(100, 100);
     EnemySpawner* ratSpawner = CreateEnemySpawer(ENEMY_RAT, 3, 100, 350, 350);
@@ -39,6 +42,9 @@ int main()
     FreeEnemySpawner(ratSpawner);
     FreeEnemies();
     FreePlayer(player);
+
+    UnloadPlayerResources();
+    UnloadEnemyResources();
 
     return 0;
 }

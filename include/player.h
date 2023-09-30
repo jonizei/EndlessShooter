@@ -11,6 +11,7 @@ typedef struct _player {
     Transform2D transform;
     float movementSpeed;
     Weapon* weapon;
+    Texture2D texture;
 } Player;
 
 Player* CreatePlayer(int x, int y);
@@ -22,5 +23,7 @@ void MoveBullets();
 void DrawBullets();
 void CheckEnemyCollisionWithBullets(Enemy* enemy);
 Player* GetPlayer();
+void LoadPlayerResources();
+void UnloadPlayerResources();
 
 #endif

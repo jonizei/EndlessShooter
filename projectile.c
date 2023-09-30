@@ -6,7 +6,7 @@
 
 // PUBLIC FUNCTIONS
 
-Projectile* CreateProjectile(int x, int y, int width, int height, double speed, double direction, double damage)
+Projectile* CreateProjectile(Texture2D texture, int x, int y, int width, int height, float speed, float direction)
 {
     Projectile* p = malloc(sizeof(Projectile));
     p->id = -1;
@@ -14,9 +14,11 @@ Projectile* CreateProjectile(int x, int y, int width, int height, double speed, 
     p->transform.position.y = y;
     p->transform.size.x = width;
     p->transform.size.y = height;
+    p->texture = texture;
     p->movementSpeed = speed;
     p->direction = 0;
-    p->damage = damage;
+    p->damage = 0;
+    p->angle = 0;
 
     return p;
 }
@@ -35,7 +37,8 @@ void MoveProjectile(Projectile* projectile)
 
 void DrawProjectile(Projectile* projectile)
 {
-    DrawRectangleV(projectile->transform.position, projectile->transform.size, BLACK);
+    //DrawTextureV(projectile->texture, projectile->transform.position, WHITE);
+    DrawTextureEx(projectile->texture, projectile->transform.position, projectile->angle, 1.0, WHITE);
 }
 
 // PRIVATE FUNCTIONS

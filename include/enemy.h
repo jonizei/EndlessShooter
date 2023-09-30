@@ -20,6 +20,7 @@ typedef struct _enemy {
     EnemyType type;
     Transform2D transform;
     Vector2 startPosition;
+    Texture2D texture;
     int health;
     EnemyState defaultState;
     EnemyState state;
@@ -37,5 +38,7 @@ void DrawEnemy(Enemy* enemy);
 void FreeEnemy(Enemy* enemy);
 bool IsEnemyAlive(Enemy* enemy);
 void UpdateEnemy(Enemy* enemy);
+void LoadEnemyResources();
+void UnloadEnemyResources();
 
 #endif

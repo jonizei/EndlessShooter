@@ -8,12 +8,14 @@
 typedef struct _projectile {
     int id;
     Transform2D transform;
-    double movementSpeed;
-    double direction;
+    Texture2D texture;
+    float movementSpeed;
+    float direction;
+    float angle;
     int damage;
 } Projectile;
 
-Projectile* CreateProjectile(int x, int y, int width, int height, double speed, double direction, double damage);
+Projectile* CreateProjectile(Texture2D texture, int x, int y, int width, int height, float speed, float direction);
 void FreeProjectile(Projectile* projectile);
 void MoveProjectile(Projectile* projectile);
 void DrawProjectile(Projectile* projectile);

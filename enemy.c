@@ -5,8 +5,12 @@
 #include "include/raymath.h"
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 
 // CONSTANT VALUES
+
+// GLOBAL VARIABLES
+Image ratEnemyImage;
 
 // PRIVATE FUNCTION DECLARATIONS
 Enemy* CreateEnemy(int id, int x, int y, int width, int height);
@@ -16,6 +20,16 @@ bool IsPlayerInRange(Enemy* enemy, Player* player);
 Vector2 GetRandomTarget(Enemy* enemy);
 
 // PUBLIC FUNCTIONS
+
+void LoadEnemyResources()
+{
+    ratEnemyImage = LoadImage("resources/textures/rat_enemy_sprite.png");
+}
+
+void UnloadEnemyResources()
+{
+    UnloadImage(ratEnemyImage);
+}
 
 Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
 {
@@ -27,6 +41,7 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
     float wanderRadius = 150.0;
     float wanderTargetTime = 5.0;
     float movementSpeed = 1.0;
+    Texture2D texture;
 
     switch(type)
     {
@@ -35,7 +50,9 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             height = 16;
             health = 50;
             defaultState = ENEMY_STATE_WANDER;
+            texture = LoadTextureFromImage(ratEnemyImage);
         break;
+
     }
 
     Enemy* enemy = CreateEnemy(id, x, y, width, height);
@@ -47,13 +64,14 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
     enemy->sightRadius = sightRadius;
     enemy->wanderRadius = wanderRadius;
     enemy->wanderTargetTime = wanderTargetTime;
+    enemy->texture = texture;
 
     return enemy;
 }
 
 void DrawEnemy(Enemy* enemy)
 {
-    DrawRectangleV(enemy->transform.position, enemy->transform.size, RED);
+    DrawTexture(enemy->texture, enemy->transform.position.x, enemy->transform.position.y, WHITE);
 }
 
 void FreeEnemy(Enemy* enemy)
