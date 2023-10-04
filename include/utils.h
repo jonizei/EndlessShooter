@@ -35,8 +35,6 @@ Vector2 GetWorldPosition(Vector2 position);
 float GetMouseDirection(Vector2 position);
 float GetDirection(Vector2 from, Vector2 to);
 Vector2 GetPositionInDistance(Vector2 position, float distance, float direction);
-bool ContainsPosition(Vector2 position, int screenWidth, int screenHeight);
-bool IsCollision(Transform2D a, Transform2D b);
 Box2D CreateBox2D(Vector2 position, float width, float height, float direction);
 Box2D RotateBox2D(Box2D box, float direction);
 Box2D MoveBox2D(Box2D box, Vector2 position);

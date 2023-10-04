@@ -111,26 +111,6 @@ void DrawBullets()
     }
 }
 
-bool IsEnemyCollidingWithBullet(Enemy* enemy)
-{
-    bool collides = false;
-    for (int i = 0; i < MAX_PROJECTILE; i++)
-    {
-        if (projectilePool[i] != NULL)
-        {
-            collides = IsCollision(projectilePool[i]->transform, enemy->transform);
-
-            if (collides) 
-            {
-                RemoveFromProjectilePool(projectilePool[i]->id);
-                break;
-            }
-        }
-    }
-
-    return collides;
-}
-
 void CheckEnemyCollisionWithBullets(Enemy* enemy)
 {
     for (int i = 0; i < MAX_PROJECTILE; i++)
