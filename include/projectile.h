@@ -8,6 +8,7 @@
 typedef struct _projectile {
     int id;
     Transform2D transform;
+    Rectangle collider;
     Texture2D texture;
     float movementSpeed;
     float direction;

@@ -4,6 +4,9 @@
 
 // PROJECTILE CONSTANTS
 
+// PRIVATE FUNCTION DECLARATIONS
+void MoveProjectileCollider(Projectile* projectile);
+
 // PUBLIC FUNCTIONS
 
 Projectile* CreateProjectile(Texture2D texture, int x, int y, int width, int height, float speed, float direction)
@@ -17,6 +20,10 @@ Projectile* CreateProjectile(Texture2D texture, int x, int y, int width, int hei
     p->transform.position.y = y;
     p->transform.size.x = width;
     p->transform.size.y = height;
+    p->collider.x = x;
+    p->collider.y = y;
+    p->collider.width = width;
+    p->collider.height = height;
     p->texture = texture;
     p->movementSpeed = speed;
     p->direction = 0;
@@ -36,10 +43,9 @@ void FreeProjectile(Projectile* projectile)
 void MoveProjectile(Projectile* projectile)
 {
     Vector2 movement = GetPositionInDistance(projectile->transform.position, projectile->movementSpeed, projectile->direction);
-    projectile->transform.position.x += projectile->movementSpeed * cos(projectile->direction);
-    projectile->transform.position.y += projectile->movementSpeed * sin(projectile->direction); 
-
     projectile->transform.position = movement;
+
+    MoveProjectileCollider(projectile);
 }
 
 void DrawProjectile(Projectile* projectile)
@@ -48,3 +54,9 @@ void DrawProjectile(Projectile* projectile)
 }
 
 // PRIVATE FUNCTIONS
+
+void MoveProjectileCollider(Projectile* projectile)
+{
+    projectile->collider.x = projectile->transform.position.x;
+    projectile->collider.y = projectile->transform.position.y;
+}

@@ -33,7 +33,6 @@ int main()
     {
         camera.target = (Vector2){ player->transform.position.x + 20.0f, player->transform.position.y + 20.0f };
         UpdatePlayer(player);
-        MoveBullets(SCREEN_WIDTH, SCREEN_HEIGHT);
         CheckEnemyCollision();
         UpdateEnemies();
         UpdateSpawner(ratSpawner);

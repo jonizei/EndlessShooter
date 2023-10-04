@@ -9,9 +9,12 @@
 
 typedef struct _player {
     Transform2D transform;
+    Rectangle collider;
     float movementSpeed;
     Weapon* weapon;
     Texture2D texture;
+    Box2D hitArea;
+    float health;
 } Player;
 
 Player* CreatePlayer(int x, int y);
@@ -23,5 +26,6 @@ void CheckEnemyCollisionWithBullets(Enemy* enemy);
 Player* GetPlayer();
 void LoadPlayerResources();
 void UnloadPlayerResources();
+void TakeDamage(Player* player, float damage);
 
 #endif

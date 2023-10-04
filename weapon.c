@@ -6,7 +6,7 @@
 Weapon* CreateWeapon()
 {
     Weapon* w = malloc(sizeof(Weapon));
-    w->speed = 3;
+    w->speed = 5;
     w->attackSpeed = 0.1;
     w->lastShot = 0;
     w->offset = 0;
