@@ -7,10 +7,19 @@
 #include<stdlib.h>
 #include<string.h>
 
+#define MAX_ENEMY_PROJECTILE 500
+
 // CONSTANT VALUES
+const int ENEMY_BULLET_WIDTH = 10;
+const int ENEMY_BULLET_HEIGHT = 10;
+const float ENEMY_BULLET_SPEED = 5;
 
 // GLOBAL VARIABLES
+Projectile* enemyProjectilePool[MAX_ENEMY_PROJECTILE];
+int enemyProjectileCount = 0;
+int enemyProjectileId = 1;
 Image ratEnemyImage;
+Image enemyBulletImage;
 
 // PRIVATE FUNCTION DECLARATIONS
 Enemy* CreateEnemy(int id, int x, int y, int width, int height);
@@ -22,18 +31,24 @@ Vector2 GetRandomTarget(Enemy* enemy);
 void MoveHitArea(Enemy* enemy);
 void EnemyAttack(Enemy* enemy);
 void EnemyHitAttack(Enemy* enemy);
+void EnemyShootAttack(Enemy* enemy);
 void MoveEnemyCollider(Enemy* enemy);
+void MoveAllEnemyBullets(Enemy* enemy);
+void CheckPlayerCollisionWithBullets(Player* player);
+void PlayerCollisionWithBullet(Player* player, Projectile* bullet);
 
 // PUBLIC FUNCTIONS
 
 void LoadEnemyResources()
 {
     ratEnemyImage = LoadImage("resources/textures/rat_enemy_sprite.png");
+    enemyBulletImage = LoadImage("resources/textures/bullet_sprite.png");
 }
 
 void UnloadEnemyResources()
 {
     UnloadImage(ratEnemyImage);
+    UnloadImage(enemyBulletImage);
 }
 
 Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
@@ -62,7 +77,7 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             damage = 5.0f;
             attackSpeed = 1.0f;
             defaultMovementState = ENEMY_STATE_WANDER;
-            attackType = ENEMY_ATTACK_HIT;
+            attackType = ENEMY_ATTACK_SHOOT;
             texture = LoadTextureFromImage(ratEnemyImage);
             hitAreaHeight = 20.0f;
             hitAreaWidth = width * 1.5f;
@@ -104,10 +119,13 @@ void DrawEnemy(Enemy* enemy)
 {
     DrawTextureEx(enemy->texture, enemy->transform.position, 0, enemy->transform.scale, WHITE);
     DrawBox2D(enemy->hitArea);
+
+    DrawProjectilePool(enemyProjectilePool, MAX_ENEMY_PROJECTILE);
 }
 
 void FreeEnemy(Enemy* enemy)
 {
+    FreeProjectilePool(enemyProjectilePool, MAX_ENEMY_PROJECTILE);
     MyFree(&enemy);
 }
 
@@ -122,6 +140,8 @@ void UpdateEnemy(Enemy* enemy)
     MoveEnemy(enemy);
     MoveHitArea(enemy);
     EnemyAttack(enemy);
+    MoveAllEnemyBullets(enemy);
+    CheckPlayerCollisionWithBullets(GetPlayer());
 }
 
 // PRIVATE FUNCTIONS
@@ -259,6 +279,10 @@ void EnemyAttack(Enemy* enemy)
         {
             EnemyHitAttack(enemy);
         }
+        else if (enemy->attackType == ENEMY_ATTACK_SHOOT && canAttack)
+        {
+            EnemyShootAttack(enemy);
+        }
 
     }
 }
@@ -272,8 +296,85 @@ void EnemyHitAttack(Enemy* enemy)
     }
 }
 
+void EnemyShootAttack(Enemy* enemy)
+{
+    if (IsPlayerInRange(enemy, GetPlayer())) 
+    {
+        Projectile* bullet = CreateProjectile(
+            LoadTextureFromImage(enemyBulletImage)
+            , enemy->transform.position.x
+            , enemy->transform.position.y
+            , ENEMY_BULLET_WIDTH
+            , ENEMY_BULLET_HEIGHT
+            , ENEMY_BULLET_SPEED
+            , 0
+        );
+
+        bullet->id = enemyProjectileId;
+        bullet->direction = GetDirection(enemy->transform.position, GetPlayer()->transform.position);
+        bullet->angle = 180 + Vector2Angle(enemy->transform.position, GetPlayer()->transform.position);
+        bullet->damage = 10;
+
+        bool success = AddToProjectilePool(enemyProjectilePool, bullet, MAX_ENEMY_PROJECTILE);
+
+        if (success) 
+        {
+            enemyProjectileId++;
+            enemyProjectileCount++;
+            enemy->lastAttack = GetTime();
+        }
+    }
+}
+
 void MoveEnemyCollider(Enemy* enemy)
 {
     enemy->collider.x = enemy->transform.position.x;
     enemy->collider.y = enemy->transform.position.y;
+}
+
+void MoveAllEnemyBullets(Enemy* enemy)
+{
+    for (int i = 0; i < MAX_ENEMY_PROJECTILE; i++)
+    {
+        if (enemyProjectilePool[i] != NULL) 
+        {
+            MoveProjectile(enemyProjectilePool[i]);
+
+            float distance = Vector2Distance(enemy->transform.position, enemyProjectilePool[i]->transform.position);
+            if (distance > GetScreenWidth()) 
+            {
+                bool success = RemoveFromProjectilePool(enemyProjectilePool, enemyProjectilePool[i]->id, MAX_ENEMY_PROJECTILE);
+                if (success)
+                {
+                    enemyProjectileCount--;
+                }
+            }
+        }
+    }
+}
+
+void CheckPlayerCollisionWithBullets(Player* player)
+{
+    for (int i = 0; i < MAX_ENEMY_PROJECTILE; i++)
+    {
+        if (enemyProjectilePool[i] != NULL)
+        {
+            PlayerCollisionWithBullet(player, enemyProjectilePool[i]);
+        }
+    }
+}
+
+void PlayerCollisionWithBullet(Player* player, Projectile* bullet)
+{
+    bool collides = CheckCollisionRecs(bullet->collider, player->collider);
+
+    if (collides)
+    {
+        TakeDamage(player, bullet->damage);
+        bool success = RemoveFromProjectilePool(enemyProjectilePool, bullet->id, MAX_ENEMY_PROJECTILE);
+        if (success)
+        {
+            enemyProjectileCount--;
+        }
+    }
 }

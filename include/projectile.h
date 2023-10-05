@@ -19,6 +19,10 @@ typedef struct _projectile {
 Projectile* CreateProjectile(Texture2D texture, int x, int y, int width, int height, float speed, float direction);
 void FreeProjectile(Projectile* projectile);
 void MoveProjectile(Projectile* projectile);
+void DrawProjectilePool(Projectile** pool, size_t size);
 void DrawProjectile(Projectile* projectile);
+bool AddToProjectilePool(Projectile** pool, Projectile* projectile, size_t size);
+bool RemoveFromProjectilePool(Projectile** pool, int id, size_t size);
+void FreeProjectilePool(Projectile** pool, size_t size);
 
 #endif

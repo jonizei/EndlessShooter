@@ -21,7 +21,6 @@ Player* CreatePlayer(int x, int y);
 void FreePlayer(Player* player);
 void UpdatePlayer(Player* player);
 void DrawPlayer(Player* player);
-void DrawBullets();
 void CheckEnemyCollisionWithBullets(Enemy* enemy);
 Player* GetPlayer();
 void LoadPlayerResources();

@@ -32,10 +32,8 @@ void MovePlayer(Player* player);
 void ShootPlayer(Player* player);
 void MoveAllBullets(Player* player);
 void MoveWeapon(Player* player);
-void AddToProjectilePool(Projectile* projectile);
-void RemoveFromProjectilePool(int id);
-void FreeBullets();
 void EnemyCollisionWithBullet(Enemy* enemy, Projectile* bullet);
+void MoveCollider(Player* player);
 
 // PUBLIC FUNCTIONS
 
@@ -82,7 +80,7 @@ Player* CreatePlayer(int x, int y)
 void FreePlayer(Player* player)
 {
     UnloadTexture(player->texture);
-    FreeBullets();
+    FreeProjectilePool(projectilePool, MAX_PROJECTILE);
     FreeWeapon(player->weapon);
     MyFree(&player);
 }
@@ -98,17 +96,8 @@ void UpdatePlayer(Player* player)
 void DrawPlayer(Player* player)
 {
     DrawTextureEx(player->texture, player->transform.position, 0, player->transform.scale, WHITE);
-}
 
-void DrawBullets()
-{
-    for (int i = 0; i < MAX_PROJECTILE; i++)
-    {
-        if (projectilePool[i] != NULL) 
-        {
-            DrawProjectile(projectilePool[i]);
-        }
-    }
+    DrawProjectilePool(projectilePool, MAX_PROJECTILE);
 }
 
 void CheckEnemyCollisionWithBullets(Enemy* enemy)
@@ -178,10 +167,14 @@ void ShootPlayer(Player* player)
             bullet->angle = 180 + Vector2Angle(player->weapon->transform.position, GetMouseWorldPosition());
             bullet->damage = 10;
 
-            AddToProjectilePool(bullet);
-            projectileId++;
+            bool success = AddToProjectilePool(projectilePool, bullet, MAX_PROJECTILE);
 
-            player->weapon->lastShot = GetTime();
+            if (success)
+            {
+                projectileId++;
+                projectileCount++;
+                player->weapon->lastShot = GetTime();
+            }
         }
     }
 }
@@ -197,7 +190,11 @@ void MoveAllBullets(Player* player)
             float distance = Vector2Distance(player->transform.position, projectilePool[i]->transform.position);
             if (distance > GetScreenWidth()) 
             {
-                RemoveFromProjectilePool(projectilePool[i]->id);
+                bool success = RemoveFromProjectilePool(projectilePool, projectilePool[i]->id, MAX_PROJECTILE);
+                if (success)
+                {
+                    projectileCount--;
+                }
             }
         }
     }
@@ -221,44 +218,6 @@ void MoveCollider(Player* player)
     player->collider.y = player->transform.position.y;
 }
 
-void AddToProjectilePool(Projectile* projectile)
-{
-    for(int i = 0; i < MAX_PROJECTILE; i++)
-    {
-        if(projectilePool[i] == NULL)
-        {
-            projectilePool[i] = projectile;
-            projectileCount++;
-            break;
-        }
-    }
-}
-
-void RemoveFromProjectilePool(int id)
-{
-    for(int i = 0; i < MAX_PROJECTILE; i++)
-    {
-        if(projectilePool[i] != NULL)
-        {
-            if(projectilePool[i]->id == id) 
-            {
-                FreeProjectile(projectilePool[i]);
-                projectilePool[i] = NULL;
-                projectileCount--;
-                break;
-            }
-        }
-    }
-}
-
-void FreeBullets()
-{
-    for (int i = 0; i < MAX_PROJECTILE; i++)
-    {
-        FreeProjectile(projectilePool[i]);
-    }
-}
-
 void EnemyCollisionWithBullet(Enemy* enemy, Projectile* bullet)
 {
     bool collides = CheckCollisionRecs(bullet->collider, enemy->collider);
@@ -266,6 +225,10 @@ void EnemyCollisionWithBullet(Enemy* enemy, Projectile* bullet)
     if (collides)
     {
         enemy->health -= bullet->damage;
-        RemoveFromProjectilePool(bullet->id);
+        bool success = RemoveFromProjectilePool(projectilePool, bullet->id, MAX_PROJECTILE);
+        if (success)
+        {
+            projectileCount--;
+        }
     }
 }

@@ -36,8 +36,7 @@ Projectile* CreateProjectile(Texture2D texture, int x, int y, int width, int hei
 
 void FreeProjectile(Projectile* projectile)
 {
-    free(projectile);
-    projectile = NULL;
+    MyFree(&projectile);
 }
 
 void MoveProjectile(Projectile* projectile)
@@ -48,9 +47,62 @@ void MoveProjectile(Projectile* projectile)
     MoveProjectileCollider(projectile);
 }
 
+void DrawProjectilePool(Projectile** pool, size_t size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (pool[i] != NULL) 
+        {
+            DrawProjectile(pool[i]);
+        }
+    }
+}
+
 void DrawProjectile(Projectile* projectile)
 {
     DrawTextureEx(projectile->texture, projectile->transform.position, projectile->angle, projectile->transform.scale, WHITE);
+}
+
+bool AddToProjectilePool(Projectile** pool, Projectile* projectile, size_t size)
+{
+    bool success = false;
+    for(int i = 0; i < size && !success; i++)
+    {
+        if(pool[i] == NULL)
+        {
+            pool[i] = projectile;
+            success = true;
+        }
+    }
+
+    return success;
+}
+
+bool RemoveFromProjectilePool(Projectile** pool, int id, size_t size)
+{
+    bool success = false;
+    for(int i = 0; i < size && !success; i++)
+    {
+        if(pool[i] != NULL)
+        {
+            if(pool[i]->id == id) 
+            {
+                FreeProjectile(pool[i]);
+                pool[i] = NULL;
+                success = true;
+            }
+        }
+    }
+
+    return success;
+}
+
+void FreeProjectilePool(Projectile** pool, size_t size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        FreeProjectile(pool[i]);
+    }
 }
 
 // PRIVATE FUNCTIONS

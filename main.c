@@ -45,7 +45,6 @@ int main()
 
                 DrawPlayer(player);
                 DrawEnemies();
-                DrawBullets();
 
             EndMode2D();
 
