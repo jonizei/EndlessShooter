@@ -17,7 +17,7 @@ typedef struct _player {
     float health;
 } Player;
 
-Player* CreatePlayer(int x, int y);
+Player* CreatePlayer(float x, float y);
 void FreePlayer(Player* player);
 void UpdatePlayer(Player* player);
 void DrawPlayer(Player* player);

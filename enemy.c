@@ -273,7 +273,7 @@ void MoveHitArea(Enemy* enemy)
     if (enemy->movementState == ENEMY_STATE_WANDER)
     {
         direction = GetDirection(enemyOrigin, enemy->wanderTarget);
-    } else if (enemy->movementState =+ ENEMY_STATE_PURSUE)
+    } else if (enemy->movementState == ENEMY_STATE_PURSUE)
     {
         direction = GetDirection(enemyOrigin, GetOrigin(GetPlayer()->transform));
     }

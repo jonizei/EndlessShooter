@@ -3,10 +3,18 @@
 #include "include/enemy.h"
 #include "include/enemy_handler.h"
 #include "include/utils.h"
+#include "include/grid.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 680
 #define FPS 60
+
+#define MAP_COLUMN_COUNT 100
+#define MAP_ROW_COUNT 100
+#define MAP_TILE_WIDTH 16   
+#define MAP_TILE_HEIGHT 16
+
+void UpdateCameraPosition(Camera2D* camera, Vector2 target);
 
 int main() 
 {
@@ -14,16 +22,24 @@ int main()
 
     SetTargetFPS(FPS);
 
+    float mapWidth = MAP_COLUMN_COUNT * MAP_TILE_WIDTH;
+    float mapHeight = MAP_ROW_COUNT * MAP_TILE_HEIGHT;
+
+    SetMapHeight(mapHeight);
+    SetMapWidth(mapWidth);
+
     LoadPlayerResources();
     LoadEnemyResources();
 
-    // Create player
-    Player* player = CreatePlayer(100, 100);
+    TileGrid* mainGrid = CreateTileGrid(0, 0, MAP_COLUMN_COUNT, MAP_ROW_COUNT, MAP_TILE_WIDTH, MAP_TILE_HEIGHT);
+
+    Vector2 playerStartPosition = GetTileGridTilePosition(mainGrid, 5, 5);
+    Player* player = CreatePlayer(playerStartPosition.x, playerStartPosition.y);
     EnemySpawner* ratSpawner = CreateEnemySpawer(ENEMY_RAT, 3, 100, 350, 350);
     EnemySpawner* goblinSpawner = CreateEnemySpawer(ENEMY_GOBLIN, 5, 100, 200, 450);
 
     Camera2D camera = {0};
-    camera.target = (Vector2){ player->transform.position.x + 10.0f, player->transform.position.y + 10.0f };
+    camera.target = GetOrigin(player->transform);
     camera.offset = (Vector2){ SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f };
     camera.rotation = 0.0f;
     camera.zoom = 2.0f;
@@ -32,7 +48,7 @@ int main()
 
     while(!WindowShouldClose())
     {
-        camera.target = (Vector2){ player->transform.position.x + 20.0f, player->transform.position.y + 20.0f };
+        UpdateCameraPosition(&camera, GetOrigin(player->transform));
         UpdatePlayer(player);
         CheckEnemyCollision();
         UpdateEnemies();
@@ -45,6 +61,7 @@ int main()
 
             BeginMode2D(camera);
 
+                DrawTileGrid(mainGrid);
                 DrawPlayer(player);
                 DrawEnemies();
 
@@ -57,9 +74,37 @@ int main()
     FreeEnemySpawner(ratSpawner);
     FreeEnemies();
     FreePlayer(player);
+    FreeTileGrid(mainGrid);
 
     UnloadPlayerResources();
     UnloadEnemyResources();
 
     return 0;
+}
+
+void UpdateCameraPosition(Camera2D* camera, Vector2 target)
+{
+    float cameraWidth = camera->offset.x / camera->zoom;
+    float cameraHeight = camera->offset.y / camera->zoom;
+
+    if (target.x < cameraWidth)
+    {
+        target.x = cameraWidth;
+    } 
+    else if (GetMapWidth() - target.x < cameraWidth)
+    {
+        target.x = GetMapWidth() - cameraWidth;
+    }
+
+    if (target.y < cameraHeight)
+    {
+        target.y = cameraHeight;
+    }
+    else if (GetMapHeight() - target.y < cameraHeight)
+    {
+        target.y = GetMapHeight() - cameraHeight;
+    }
+
+
+    camera->target = target;
 }

@@ -4,7 +4,9 @@
 #include<math.h>
 
 // GLOBAL VARIABLES
-Camera2D* cameraRef = NULL;
+Camera2D* _CameraRef = NULL;
+float _MapWidth = 0.0f;
+float _MapHeight = 0.0f;
 
 // PRIVATE FUNCTION DECLARATIONS
 
@@ -12,12 +14,32 @@ Camera2D* cameraRef = NULL;
 
 void SetCamera(Camera2D* camera)
 {
-    cameraRef = camera;
+    _CameraRef = camera;
 }
 
 Camera2D* GetCamera()
 {
-    return cameraRef;
+    return _CameraRef;
+}
+
+void SetMapWidth(float width)
+{
+    _MapWidth = width;
+}
+
+void SetMapHeight(float height)
+{
+    _MapHeight = height;
+}
+
+float GetMapWidth()
+{
+    return _MapWidth;
+}
+
+float GetMapHeight()
+{
+    return _MapHeight;
 }
 
 // TODO: Make sure this function works correctly

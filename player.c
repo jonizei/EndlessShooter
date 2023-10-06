@@ -49,7 +49,7 @@ void UnloadPlayerResources()
     UnloadImage(bulletImage);
 }
 
-Player* CreatePlayer(int x, int y)
+Player* CreatePlayer(float x, float y)
 {
     float playerArea = WIDTH * HEIGHT;
 

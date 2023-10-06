@@ -28,6 +28,10 @@ typedef struct _line2d {
 
 void SetCamera(Camera2D* camera);
 Camera2D* GetCamera();
+void SetMapWidth(float width);
+void SetMapHeight(float height);
+float GetMapWidth();
+float GetMapHeight();
 void MyFree(void** ptr);
 Vector2 GetOrigin(Transform2D transform);
 Vector2 GetMouseWorldPosition();
