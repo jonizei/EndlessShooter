@@ -12,7 +12,7 @@
 // CONSTANT VALUES
 const int ENEMY_BULLET_WIDTH = 10;
 const int ENEMY_BULLET_HEIGHT = 10;
-const float ENEMY_BULLET_SPEED = 5;
+const float ENEMY_BULLET_SPEED = 1.5f;
 
 // GLOBAL VARIABLES
 Projectile* enemyProjectilePool[MAX_ENEMY_PROJECTILE];
@@ -20,6 +20,7 @@ int enemyProjectileCount = 0;
 int enemyProjectileId = 1;
 Image ratEnemyImage;
 Image enemyBulletImage;
+Image goblinEnemyImage;
 
 // PRIVATE FUNCTION DECLARATIONS
 Enemy* CreateEnemy(int id, int x, int y, int width, int height);
@@ -43,12 +44,14 @@ void LoadEnemyResources()
 {
     ratEnemyImage = LoadImage("resources/textures/rat_enemy_sprite.png");
     enemyBulletImage = LoadImage("resources/textures/bullet_sprite.png");
+    goblinEnemyImage = LoadImage("resources/textures/goblin_enemy_sprite.png");
 }
 
 void UnloadEnemyResources()
 {
     UnloadImage(ratEnemyImage);
     UnloadImage(enemyBulletImage);
+    UnloadImage(goblinEnemyImage);
 }
 
 Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
@@ -73,14 +76,25 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
         case ENEMY_RAT:
             width = 16;
             height = 16;
-            health = 50.0f;
+            health = 30.0f;
             damage = 5.0f;
-            attackSpeed = 1.0f;
+            attackSpeed = 1.2f;
             defaultMovementState = ENEMY_STATE_WANDER;
-            attackType = ENEMY_ATTACK_SHOOT;
+            attackType = ENEMY_ATTACK_HIT;
             texture = LoadTextureFromImage(ratEnemyImage);
             hitAreaHeight = 20.0f;
             hitAreaWidth = width * 1.5f;
+        break;
+
+        case ENEMY_GOBLIN:
+            width = 16;
+            height = 16;
+            health = 50.0f;
+            damage = 5.0f;
+            attackSpeed = 1.5f;
+            texture = LoadTextureFromImage(goblinEnemyImage);
+            defaultMovementState = ENEMY_STATE_WANDER;
+            attackType = ENEMY_ATTACK_SHOOT;
         break;
 
     }

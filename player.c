@@ -14,7 +14,7 @@ const int BUTTON_RIGHT = KEY_D;
 // PLAYER CONSTANTS
 const int HEIGHT = 16;
 const int WIDTH = 16;
-const float MOVEMENT_SPEED = 3.0;
+const float MOVEMENT_SPEED = 2.5f;
 const int BULLET_HEIGHT = 10;
 const int BULLET_WIDTH = 10;
 const float HEALTH = 100.0f;

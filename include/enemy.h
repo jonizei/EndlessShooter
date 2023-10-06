@@ -6,7 +6,8 @@
 #include "utils.h"
 
 typedef enum {
-    ENEMY_RAT
+    ENEMY_RAT,
+    ENEMY_GOBLIN
 } EnemyType;
 
 typedef enum {

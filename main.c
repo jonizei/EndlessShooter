@@ -20,6 +20,7 @@ int main()
     // Create player
     Player* player = CreatePlayer(100, 100);
     EnemySpawner* ratSpawner = CreateEnemySpawer(ENEMY_RAT, 3, 100, 350, 350);
+    EnemySpawner* goblinSpawner = CreateEnemySpawer(ENEMY_GOBLIN, 5, 100, 200, 450);
 
     Camera2D camera = {0};
     camera.target = (Vector2){ player->transform.position.x + 10.0f, player->transform.position.y + 10.0f };
@@ -36,6 +37,7 @@ int main()
         CheckEnemyCollision();
         UpdateEnemies();
         UpdateSpawner(ratSpawner);
+        UpdateSpawner(goblinSpawner);
 
         BeginDrawing();
 
@@ -51,6 +53,7 @@ int main()
         EndDrawing();
     }
 
+    FreeEnemySpawner(goblinSpawner);
     FreeEnemySpawner(ratSpawner);
     FreeEnemies();
     FreePlayer(player);
