@@ -1,4 +1,4 @@
-#include "include/grid.h"
+#include "include/tilegrid.h"
 #include "include/raylib.h"
 #include "include/utils.h"
 

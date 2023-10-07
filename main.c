@@ -3,14 +3,15 @@
 #include "include/enemy.h"
 #include "include/enemy_handler.h"
 #include "include/utils.h"
-#include "include/grid.h"
+#include "include/tilegrid.h"
+#include "include/game_map.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 680
 #define FPS 60
 
-#define MAP_COLUMN_COUNT 100
-#define MAP_ROW_COUNT 100
+#define MAP_COLUMN_COUNT 200
+#define MAP_ROW_COUNT 200
 #define MAP_TILE_WIDTH 16   
 #define MAP_TILE_HEIGHT 16
 
@@ -22,14 +23,47 @@ int main()
 
     SetTargetFPS(FPS);
 
+    LoadGameMapResources();
+    LoadPlayerResources();
+    LoadEnemyResources();
+
+    // 1 = start zone
+    // 2 = forest zone
+    // 3 = mountain zone
+    // 4 = swamp zone
+
+    GameMap* gameMap = CreateGameMap(MAP_COLUMN_COUNT, MAP_ROW_COUNT, MAP_TILE_WIDTH, MAP_TILE_HEIGHT);
+
+    int mapSeedBase[10][10] = {
+        { 4, 4, 4, 4, 2, 2, 2, 2, 2, 2 },
+        { 4, 4, 4, 4, 2, 2, 2, 2, 2, 2 },
+        { 4, 4, 4, 2, 2, 2, 2, 2, 2, 2 },
+        { 4, 4, 2, 2, 2, 2, 2, 2, 2, 2 },
+        { 3, 2, 2, 2, 2, 1, 1, 2, 2, 2 },
+        { 3, 3, 2, 2, 2, 1, 1, 2, 2, 2 },
+        { 3, 3, 3, 2, 2, 2, 2, 2, 2, 3 },
+        { 3, 3, 3, 3, 2, 2, 2, 2, 3, 3 },
+        { 3, 3, 3, 3, 3, 3, 2, 3, 3, 3 },
+        { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 },
+    };
+
+    int mapSeed[100];
+
+    for (int i = 0; i < 10; i++) 
+    {
+        for (int j = 0; j < 10; j++)
+        {   
+            mapSeed[i * 10 + j] = mapSeedBase[i][j];
+        }
+    }
+
+    GenerateGameMap(gameMap, &mapSeed, 10, 10);
+
     float mapWidth = MAP_COLUMN_COUNT * MAP_TILE_WIDTH;
     float mapHeight = MAP_ROW_COUNT * MAP_TILE_HEIGHT;
 
     SetMapHeight(mapHeight);
     SetMapWidth(mapWidth);
-
-    LoadPlayerResources();
-    LoadEnemyResources();
 
     TileGrid* mainGrid = CreateTileGrid(0, 0, MAP_COLUMN_COUNT, MAP_ROW_COUNT, MAP_TILE_WIDTH, MAP_TILE_HEIGHT);
 
@@ -61,7 +95,8 @@ int main()
 
             BeginMode2D(camera);
 
-                DrawTileGrid(mainGrid);
+                //DrawTileGrid(mainGrid);
+                DrawGameMap(gameMap);
                 DrawPlayer(player);
                 DrawEnemies();
 
@@ -75,7 +110,9 @@ int main()
     FreeEnemies();
     FreePlayer(player);
     FreeTileGrid(mainGrid);
+    FreeGameMap(gameMap);
 
+    UnloadGameMapResources();
     UnloadPlayerResources();
     UnloadEnemyResources();
 
