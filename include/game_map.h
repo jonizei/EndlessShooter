@@ -6,6 +6,8 @@
 typedef struct _game_map {
     TileGrid* mapGrid;
     int* mapLayout;
+    float height;
+    float width;
     Texture2D* textures;
     size_t textureCount;
 } GameMap;

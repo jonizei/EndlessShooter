@@ -5,8 +5,7 @@
 
 // GLOBAL VARIABLES
 Camera2D* _CameraRef = NULL;
-float _MapWidth = 0.0f;
-float _MapHeight = 0.0f;
+GameMap * _GameMapRef = NULL;
 
 // PRIVATE FUNCTION DECLARATIONS
 
@@ -22,24 +21,14 @@ Camera2D* GetCamera()
     return _CameraRef;
 }
 
-void SetMapWidth(float width)
+void SetGameMap(GameMap* gameMap)
 {
-    _MapWidth = width;
+    _GameMapRef = gameMap;
 }
 
-void SetMapHeight(float height)
+GameMap* GetGameMap()
 {
-    _MapHeight = height;
-}
-
-float GetMapWidth()
-{
-    return _MapWidth;
-}
-
-float GetMapHeight()
-{
-    return _MapHeight;
+    return _GameMapRef;
 }
 
 // TODO: Make sure this function works correctly

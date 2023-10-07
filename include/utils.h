@@ -5,6 +5,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
+#include "game_map.h"
 #include "raylib.h"
 
 typedef struct _transform2d {
@@ -28,10 +29,8 @@ typedef struct _line2d {
 
 void SetCamera(Camera2D* camera);
 Camera2D* GetCamera();
-void SetMapWidth(float width);
-void SetMapHeight(float height);
-float GetMapWidth();
-float GetMapHeight();
+void SetGameMap(GameMap* gameMap);
+GameMap* GetGameMap();
 void MyFree(void** ptr);
 Vector2 GetOrigin(Transform2D transform);
 Vector2 GetMouseWorldPosition();

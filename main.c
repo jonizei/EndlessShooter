@@ -59,15 +59,9 @@ int main()
 
     GenerateGameMap(gameMap, &mapSeed, 10, 10);
 
-    float mapWidth = MAP_COLUMN_COUNT * MAP_TILE_WIDTH;
-    float mapHeight = MAP_ROW_COUNT * MAP_TILE_HEIGHT;
+    SetGameMap(gameMap);
 
-    SetMapHeight(mapHeight);
-    SetMapWidth(mapWidth);
-
-    TileGrid* mainGrid = CreateTileGrid(0, 0, MAP_COLUMN_COUNT, MAP_ROW_COUNT, MAP_TILE_WIDTH, MAP_TILE_HEIGHT);
-
-    Vector2 playerStartPosition = GetTileGridTilePosition(mainGrid, 5, 5);
+    Vector2 playerStartPosition = GetTileGridTilePosition(gameMap->mapGrid, 5, 5);
     Player* player = CreatePlayer(playerStartPosition.x, playerStartPosition.y);
     EnemySpawner* ratSpawner = CreateEnemySpawer(ENEMY_RAT, 3, 100, 350, 350);
     EnemySpawner* goblinSpawner = CreateEnemySpawer(ENEMY_GOBLIN, 5, 100, 200, 450);
@@ -95,7 +89,6 @@ int main()
 
             BeginMode2D(camera);
 
-                //DrawTileGrid(mainGrid);
                 DrawGameMap(gameMap);
                 DrawPlayer(player);
                 DrawEnemies();
@@ -109,7 +102,6 @@ int main()
     FreeEnemySpawner(ratSpawner);
     FreeEnemies();
     FreePlayer(player);
-    FreeTileGrid(mainGrid);
     FreeGameMap(gameMap);
 
     UnloadGameMapResources();
@@ -128,18 +120,18 @@ void UpdateCameraPosition(Camera2D* camera, Vector2 target)
     {
         target.x = cameraWidth;
     } 
-    else if (GetMapWidth() - target.x < cameraWidth)
+    else if (GetGameMap()->width - target.x < cameraWidth)
     {
-        target.x = GetMapWidth() - cameraWidth;
+        target.x = GetGameMap()->width - cameraWidth;
     }
 
     if (target.y < cameraHeight)
     {
         target.y = cameraHeight;
     }
-    else if (GetMapHeight() - target.y < cameraHeight)
+    else if (GetGameMap()->height - target.y < cameraHeight)
     {
-        target.y = GetMapHeight() - cameraHeight;
+        target.y = GetGameMap()->height - cameraHeight;
     }
 
 

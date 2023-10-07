@@ -47,8 +47,11 @@ GameMap* CreateGameMap(int width, int height, float tileWidth, float tileHeight)
     GameMap* gameMap = malloc(sizeof(GameMap));
     gameMap->mapGrid = CreateTileGrid(0, 0, width, height, tileWidth, tileHeight);
     gameMap->mapLayout = malloc((height * width) * sizeof(int));
+    gameMap->height = height * tileHeight;
+    gameMap->width = width * tileWidth;
     gameMap->textureCount = TEXTURE_COUNT;
     gameMap->textures = CreateGameMapTextures(gameMap);
+
     return gameMap;
 }
 
@@ -76,28 +79,6 @@ void GenerateGameMap(GameMap* gameMap, int* seed, size_t rows, size_t cols)
             }
         }
     }
-
-    /*
-    int seedIndex = 0;
-    int sectionType = seed[seedIndex];
-    int sectionWidthCounter = 0;
-    int sectionHeightCounter = 0;
-    for (int i = 0; i < gameMap->mapGrid->height * gameMap->mapGrid->width; i++)
-    {
-        gameMap->mapLayout[i] = sectionType;
-
-        if (sectionWidthCounter == sectionWidth - 1)
-        {
-            seedIndex++;
-            sectionType = seed[seedIndex];
-            sectionWidthCounter = 0;
-        }
-        else
-        {
-            sectionWidthCounter++;
-        }
-    }
-    */
 }
 
 void FreeGameMap(GameMap* gameMap)
