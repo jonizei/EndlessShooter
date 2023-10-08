@@ -34,6 +34,7 @@ void MoveAllBullets(Player* player);
 void MoveWeapon(Player* player);
 void EnemyCollisionWithBullet(Enemy* enemy, Projectile* bullet);
 void MoveCollider(Player* player);
+bool CanPlayerMove(Player* player, Vector2 position);
 
 // PUBLIC FUNCTIONS
 
@@ -125,22 +126,39 @@ void TakeDamage(Player* player, float damage)
 
 void MovePlayer(Player* player)
 {
+    Vector2 nextPosition = { player->transform.position.x, player->transform.position.y };
+
     if (IsKeyDown(BUTTON_UP))
     {
-        player->transform.position.y -= player->movementSpeed;
+        nextPosition.y -= player->movementSpeed;
     }
     else if (IsKeyDown(BUTTON_DOWN))
     {
-        player->transform.position.y += player->movementSpeed;
+        nextPosition.y += player->movementSpeed;
     }
 
     if (IsKeyDown(BUTTON_LEFT))
     {
-        player->transform.position.x -= player->movementSpeed;
+        nextPosition.x -= player->movementSpeed;
     }
     else if (IsKeyDown(BUTTON_RIGHT))
     {
-        player->transform.position.x += player->movementSpeed;
+        nextPosition.x += player->movementSpeed;
+    }
+
+    if (CanPlayerMove(player, nextPosition))
+    {
+        player->transform.position = nextPosition;
+    }
+    else if (CanPlayerMove(player, (Vector2){ nextPosition.x, player->transform.position.y }))
+    {
+        nextPosition.y = player->transform.position.y;
+        player->transform.position = nextPosition;
+    }
+    else if (CanPlayerMove(player, (Vector2){ player->transform.position.x, nextPosition.y }))
+    {
+        nextPosition.x = player->transform.position.x;
+        player->transform.position = nextPosition;
     }
 
     MoveCollider(player);
@@ -231,4 +249,12 @@ void EnemyCollisionWithBullet(Enemy* enemy, Projectile* bullet)
             projectileCount--;
         }
     }
+}
+
+bool CanPlayerMove(Player* player, Vector2 position)
+{
+    bool xInside = position.x > 0 && position.x + player->transform.size.x < GetGameMap()->width;
+    bool yInside = position.y > 0 && position.y + player->transform.size.y < GetGameMap()->height;
+
+    return xInside && yInside;
 }
