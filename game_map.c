@@ -4,13 +4,14 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#define TEXTURE_COUNT 5
+#define EMPTY_ZONE 0
+#define NEUTRAL_ZONE 1
+#define FOREST_ZONE 2
+#define MOUNTAIN_ZONE 3
+#define SWAMP_ZONE 4
+
 // CONSTANT VALUES
-const int TEXTURE_COUNT = 5;
-const int EMPTY_ZONE = 0;
-const int NEUTRAL_ZONE = 1;
-const int FOREST_ZONE = 2;
-const int MOUNTAIN_ZONE = 3;
-const int SWAMP_ZONE = 4;
 
 // GLOBAL VARIABLES
 Image emptySpaceTile;
@@ -19,8 +20,13 @@ Image forestFloorImage;
 Image rockFloorImage;
 Image swampFloorImage;
 
+int layerCount = 0;
+
 // PRIVATE FUNCTION DECLARATIONS
 Texture2D* CreateGameMapTextures(GameMap* gameMap);
+Layer FlattenLayers(GameMap* gameMap);
+void MergeLayers(Layer* a, Layer* b);
+Texture2D GetTextureByType(GameMap* gameMap, int type);
 
 // PUBLIC FUNCTIONS
 
@@ -46,17 +52,24 @@ GameMap* CreateGameMap(int width, int height, float tileWidth, float tileHeight)
 {
     GameMap* gameMap = malloc(sizeof(GameMap));
     gameMap->mapGrid = CreateTileGrid(0, 0, width, height, tileWidth, tileHeight);
-    gameMap->mapLayout = malloc((height * width) * sizeof(int));
     gameMap->height = height * tileHeight;
     gameMap->width = width * tileWidth;
+    gameMap->layers = malloc(MAX_LAYERS * sizeof(Layer));
+    memset(gameMap->layers, NULL, MAX_LAYERS * sizeof(Layer));
     gameMap->textureCount = TEXTURE_COUNT;
     gameMap->textures = CreateGameMapTextures(gameMap);
 
     return gameMap;
 }
 
-void GenerateGameMap(GameMap* gameMap, int* seed, size_t rows, size_t cols)
+Layer CreateMapLayerFromSeed(GameMap* gameMap, int* seed, size_t rows, size_t cols)
 {
+    Layer layer;
+    layer.height = gameMap->mapGrid->height;
+    layer.width = gameMap->mapGrid->width;
+    layer.layout = malloc(layer.height * layer.width * sizeof(int));
+    memset(layer.layout, 0, layer.height * layer.width * sizeof(int));
+
     int sectionWidth = gameMap->mapGrid->width / cols;
     int sectionHeight = gameMap->mapGrid->height / rows;
 
@@ -74,31 +87,47 @@ void GenerateGameMap(GameMap* gameMap, int* seed, size_t rows, size_t cols)
                 for (int m = 0; m < sectionWidth; m++)
                 {
                     int index = ((colIndex * cols + k) * sectionWidth) + m;
-                    gameMap->mapLayout[index] = seedType;
+                    layer.layout[index] = seedType;
                 }
             }
         }
     }
+
+    return layer;
 }
 
 void FreeGameMap(GameMap* gameMap)
 {
     FreeTileGrid(gameMap->mapGrid);
-    free(gameMap->mapLayout);
+    free(gameMap->layers);
     free(gameMap->textures);
     MyFree(&gameMap);
 }
 
 void DrawGameMap(GameMap* gameMap)
 {
+    Layer flattenLayer = FlattenLayers(gameMap);
     for (int i = 0; i < gameMap->mapGrid->height; i++)
     {
         for (int j = 0; j < gameMap->mapGrid->width; j++)
         {
-            int textureType = gameMap->mapLayout[i * gameMap->mapGrid->width + j];
+            int textureType = flattenLayer.layout[i * gameMap->mapGrid->width + j];
             Vector2 texturePosition = GetTileGridTilePosition(gameMap->mapGrid, j, i);
-            DrawTextureV(gameMap->textures[textureType], texturePosition, WHITE);
+            Texture2D tileTexture = GetTextureByType(gameMap, textureType);
+            DrawTextureV(tileTexture, texturePosition, WHITE);
         }
+    }
+}
+
+void AddLayer(GameMap* gameMap, Layer* layer)
+{
+    bool hasSameHeight = gameMap->mapGrid->height == layer->height;
+    bool hasSameWidth = gameMap->mapGrid->width == layer->width;
+
+    if (layerCount < MAX_LAYERS && (hasSameHeight && hasSameWidth)) 
+    {
+        gameMap->layers[layerCount] = *layer;
+        layerCount++;
     }
 }
 
@@ -114,4 +143,67 @@ Texture2D* CreateGameMapTextures(GameMap* gameMap)
     textures[SWAMP_ZONE] = LoadTextureFromImage(swampFloorImage);
 
     return textures;
+}
+
+Layer FlattenLayers(GameMap* gameMap)
+{
+    Layer flattenLayer;
+    flattenLayer.height = gameMap->mapGrid->height;
+    flattenLayer.width = gameMap->mapGrid->width;
+    flattenLayer.layout = malloc(flattenLayer.height * flattenLayer.width * sizeof(int));
+    memset(flattenLayer.layout, 0, flattenLayer.height * flattenLayer.width * sizeof(int));
+
+    for (int i = 0; i < layerCount; i++) 
+    {
+        Layer layer = gameMap->layers[i];
+        MergeLayers(&flattenLayer, &layer);
+    }
+
+    return flattenLayer;
+}
+
+void MergeLayers(Layer* a, Layer* b)
+{
+    for (int i = 0; i < a->height; i++)
+    {
+        for (int j = 0; j < a->width; j++)
+        {
+            int index = i * a->width + j;
+            int value = b->layout[index];
+            if (value > 0) 
+            {
+                a->layout[index] = value;
+            }
+        }
+    }
+}
+
+Texture2D GetTextureByType(GameMap* gameMap, int type)
+{
+    Texture2D found;
+
+    switch (type)
+    {
+        case NEUTRAL_ZONE:
+            found = gameMap->textures[NEUTRAL_ZONE];
+        break;
+
+        case FOREST_ZONE:
+            found = gameMap->textures[FOREST_ZONE];
+            break;
+
+        case MOUNTAIN_ZONE:
+            found = gameMap->textures[MOUNTAIN_ZONE];
+            break;
+
+        case SWAMP_ZONE:
+            found = gameMap->textures[SWAMP_ZONE];
+            break;
+
+        default:
+            found = gameMap->textures[EMPTY_ZONE];
+        break;
+    }
+
+    return found;
 }

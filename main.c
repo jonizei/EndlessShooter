@@ -57,8 +57,8 @@ int main()
         }
     }
 
-    GenerateGameMap(gameMap, &mapSeed, 10, 10);
-
+    Layer mapLayer = CreateMapLayerFromSeed(gameMap, &mapSeed, 10, 10);
+    AddLayer(gameMap, &mapLayer);
     SetGameMap(gameMap);
 
     Vector2 playerStartPosition = GetTileGridTilePosition(gameMap->mapGrid, 5, 5);
