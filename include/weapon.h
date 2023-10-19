@@ -13,7 +13,7 @@ typedef struct _weapon {
     float lastShot;
 } Weapon;
 
-Weapon* CreateWeapon();
+Weapon* CreateWeapon(float speed, float attackSpeed);
 void FreeWeapon(Weapon* weapon);
 
 #endif

@@ -27,6 +27,20 @@ typedef struct _line2d {
     Vector2 b;
 } Line2D;
 
+typedef struct _stats {
+    int strength;
+    int movementSpeed;
+    int attackSpeed;
+    int stamina;
+} Stats;
+
+typedef enum {
+    STAT_STRENGTH,
+    STAT_MOVEMENT_SPEED,
+    STAT_ATTACK_SPEED,
+    STAT_STAMINA
+} StatType;
+
 void SetCamera(Camera2D* camera);
 Camera2D* GetCamera();
 void SetGameMap(GameMap* gameMap);
@@ -45,5 +59,6 @@ void DrawBox2D(Box2D box);
 Vector2* Box2DToPoints(Box2D box);
 bool IsInsideBox2D(Box2D box, Vector2 point);
 float degToRad(float degrees);
+float GetStatValue(Stats stats, StatType type);
 
 #endif

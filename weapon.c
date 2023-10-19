@@ -3,11 +3,11 @@
 
 // PUBLIC FUNCTIONS
 
-Weapon* CreateWeapon()
+Weapon* CreateWeapon(float speed, float attackSpeed)
 {
     Weapon* w = malloc(sizeof(Weapon));
-    w->speed = 5;
-    w->attackSpeed = 0.1;
+    w->speed = speed;
+    w->attackSpeed = attackSpeed;
     w->lastShot = 0;
     w->offset = 0;
 

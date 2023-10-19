@@ -3,6 +3,17 @@
 #include "include/raymath.h"
 #include<math.h>
 
+// CONSTANT VALUES
+const int STRENGTH_MAX_LEVEL = 10;
+const int MOVEMENT_SPEED_MAX_LEVEL = 10;
+const int ATTACK_SPEED_MAX_LEVEL = 10;
+const int STAMINA_MAX_LEVEL = 10;
+
+const float STRENGTH_FACTOR = 4.0f;
+const float MOVEMENT_SPEED_FACTOR = 0.25f;
+const float ATTACK_SPEED_FACTOR = 0.1f;
+const float STAMINA_FACTOR = 50;
+
 // GLOBAL VARIABLES
 Camera2D* _CameraRef = NULL;
 GameMap * _GameMapRef = NULL;
@@ -143,6 +154,43 @@ bool IsInsideBox2D(Box2D box, Vector2 point)
 float degToRad(float degrees)
 {
     return degrees * DEG2RAD;
+}
+
+float GetStatValue(Stats stats, StatType type)
+{
+    float statValue = 0;
+    switch(type) 
+    {
+        case STAT_STRENGTH:
+            if (stats.strength <= STRENGTH_MAX_LEVEL) 
+            {
+                statValue = stats.strength * STRENGTH_FACTOR;
+            }
+        break;
+
+        case STAT_MOVEMENT_SPEED:
+            if (stats.movementSpeed <= MOVEMENT_SPEED_MAX_LEVEL) 
+            {
+                statValue = stats.movementSpeed * MOVEMENT_SPEED_FACTOR;
+            }
+        break;
+
+        case STAT_ATTACK_SPEED:
+            if (stats.attackSpeed <= ATTACK_SPEED_MAX_LEVEL) 
+            {
+                statValue = (ATTACK_SPEED_MAX_LEVEL - stats.attackSpeed) * ATTACK_SPEED_FACTOR;
+            }
+        break;
+
+        case STAT_STAMINA:
+            if (stats.stamina <= STAMINA_MAX_LEVEL)
+            {
+                statValue = stats.stamina * STAMINA_FACTOR;
+            }
+        break;
+    }
+
+    return statValue;
 }
 
 // PRIVATE FUNCTIONS

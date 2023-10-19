@@ -14,10 +14,13 @@ const int BUTTON_RIGHT = KEY_D;
 // PLAYER CONSTANTS
 const int HEIGHT = 16;
 const int WIDTH = 16;
-const float MOVEMENT_SPEED = 2.5f;
+const float BASE_MOVEMENT_SPEED = 1.0f;
 const int BULLET_HEIGHT = 10;
 const int BULLET_WIDTH = 10;
-const float HEALTH = 100.0f;
+const float BASE_DAMAGE = 4.0f;
+const float BASE_HEALTH = 100.0f;
+const float BASE_BULLET_SPEED = 5.0f;
+const float BASE_ATTACK_SPEED = 0.1f;
 
 // GLOBAL VARIBLES
 Projectile* projectilePool[MAX_PROJECTILE];
@@ -50,7 +53,7 @@ void UnloadPlayerResources()
     UnloadImage(bulletImage);
 }
 
-Player* CreatePlayer(float x, float y)
+Player* CreatePlayer(float x, float y, Stats stats)
 {
     float playerArea = WIDTH * HEIGHT;
 
@@ -63,11 +66,16 @@ Player* CreatePlayer(float x, float y)
     p->collider.y = y;
     p->collider.width = WIDTH;
     p->collider.height = HEIGHT;
-    p->movementSpeed = MOVEMENT_SPEED;
+    p->stats = stats;
     p->texture = LoadTextureFromImage(playerImage);
-    p->weapon = CreateWeapon();
+
+    p->health = BASE_HEALTH + GetStatValue(stats, STAT_STAMINA);
+    p->movementSpeed = BASE_MOVEMENT_SPEED + GetStatValue(stats, STAT_MOVEMENT_SPEED);
+    p->attackSpeed = BASE_ATTACK_SPEED + GetStatValue(stats, STAT_ATTACK_SPEED);
+    p->damage = BASE_DAMAGE + GetStatValue(stats, STAT_STRENGTH);
+
+    p->weapon = CreateWeapon(BASE_BULLET_SPEED, p->attackSpeed);
     p->weapon->offset = WIDTH;
-    p->health = HEALTH;
 
     float textureArea = p->texture.height * p->texture.width;
     p->transform.scale = playerArea / textureArea;
@@ -120,6 +128,14 @@ Player* GetPlayer()
 void TakeDamage(Player* player, float damage)
 {
     player->health -= damage;
+}
+
+void UpdatePlayerStats(Player* player)
+{
+    player->health = BASE_HEALTH + GetStatValue(player->stats, STAT_STAMINA);
+    player->movementSpeed = BASE_MOVEMENT_SPEED + GetStatValue(player->stats, STAT_MOVEMENT_SPEED);
+    player->attackSpeed = BASE_ATTACK_SPEED + GetStatValue(player->stats, STAT_ATTACK_SPEED);
+    player->damage = BASE_DAMAGE + GetStatValue(player->stats, STAT_STRENGTH);
 }
 
 // PRIVATE FUNCTIONS
@@ -183,7 +199,7 @@ void ShootPlayer(Player* player)
             bullet->id = projectileId;
             bullet->direction = GetMouseDirection(bullet->transform.position);
             bullet->angle = 180 + Vector2Angle(player->weapon->transform.position, GetMouseWorldPosition());
-            bullet->damage = 10;
+            bullet->damage = player->damage;
 
             bool success = AddToProjectilePool(projectilePool, bullet, MAX_PROJECTILE);
 

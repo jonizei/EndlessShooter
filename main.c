@@ -61,8 +61,9 @@ int main()
     AddLayer(gameMap, &mapLayer);
     SetGameMap(gameMap);
 
+    Stats playerBaseStats = {1, 1, 1, 1};
     Vector2 playerStartPosition = GetTileGridTilePosition(gameMap->mapGrid, 5, 5);
-    Player* player = CreatePlayer(playerStartPosition.x, playerStartPosition.y);
+    Player* player = CreatePlayer(playerStartPosition.x, playerStartPosition.y, playerBaseStats);
     EnemySpawner* ratSpawner = CreateEnemySpawer(ENEMY_RAT, 3, 100, 350, 350);
     EnemySpawner* goblinSpawner = CreateEnemySpawer(ENEMY_GOBLIN, 5, 100, 200, 450);
 
