@@ -3,6 +3,7 @@
 #include "include/utils.h"
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 
 #define TEXTURE_COUNT 5
 #define EMPTY_ZONE 0

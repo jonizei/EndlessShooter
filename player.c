@@ -69,7 +69,8 @@ Player* CreatePlayer(float x, float y, Stats stats)
     p->stats = stats;
     p->texture = LoadTextureFromImage(playerImage);
 
-    p->health = BASE_HEALTH + GetStatValue(stats, STAT_STAMINA);
+    p->maxHealth = BASE_HEALTH + GetStatValue(stats, STAT_STAMINA); 
+    p->health = p->maxHealth;
     p->movementSpeed = BASE_MOVEMENT_SPEED + GetStatValue(stats, STAT_MOVEMENT_SPEED);
     p->attackSpeed = BASE_ATTACK_SPEED + GetStatValue(stats, STAT_ATTACK_SPEED);
     p->damage = BASE_DAMAGE + GetStatValue(stats, STAT_STRENGTH);
@@ -105,7 +106,6 @@ void UpdatePlayer(Player* player)
 void DrawPlayer(Player* player)
 {
     DrawTextureEx(player->texture, player->transform.position, 0, player->transform.scale, WHITE);
-
     DrawProjectilePool(projectilePool, MAX_PROJECTILE);
 }
 

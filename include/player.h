@@ -14,6 +14,7 @@ typedef struct _player {
     Weapon* weapon;
     Texture2D texture;
     Box2D hitArea;
+    float maxHealth;
     float health;
     float movementSpeed;
     float damage;

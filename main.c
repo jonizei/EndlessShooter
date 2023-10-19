@@ -5,6 +5,7 @@
 #include "include/utils.h"
 #include "include/tilegrid.h"
 #include "include/game_map.h"
+#include "include/ui_utils.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 680
@@ -23,9 +24,12 @@ int main()
 
     SetTargetFPS(FPS);
 
+    LoadUIResources();
     LoadGameMapResources();
     LoadPlayerResources();
     LoadEnemyResources();
+
+    UILayer* uiLayer = CreateUILayer();
 
     // 1 = start zone
     // 2 = forest zone
@@ -83,6 +87,7 @@ int main()
         UpdateEnemies();
         UpdateSpawner(ratSpawner);
         UpdateSpawner(goblinSpawner);
+        UpdateUILayer(uiLayer);
 
         BeginDrawing();
 
@@ -96,6 +101,8 @@ int main()
 
             EndMode2D();
 
+            DrawUILayer(uiLayer);
+
         EndDrawing();
     }
 
@@ -104,7 +111,9 @@ int main()
     FreeEnemies();
     FreePlayer(player);
     FreeGameMap(gameMap);
+    FreeUILayer(uiLayer);
 
+    UnloadUIResources();
     UnloadGameMapResources();
     UnloadPlayerResources();
     UnloadEnemyResources();
