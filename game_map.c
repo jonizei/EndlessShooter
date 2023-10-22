@@ -28,6 +28,7 @@ Texture2D* CreateGameMapTextures(GameMap* gameMap);
 Layer FlattenLayers(GameMap* gameMap);
 void MergeLayers(Layer* a, Layer* b);
 Texture2D GetTextureByType(GameMap* gameMap, int type);
+int* ScaleSeed(int* seed, size_t rows, size_t cols, int xScale, int yScale);
 
 // PUBLIC FUNCTIONS
 
@@ -74,25 +75,18 @@ Layer CreateMapLayerFromSeed(GameMap* gameMap, int* seed, size_t rows, size_t co
     int sectionWidth = gameMap->mapGrid->width / cols;
     int sectionHeight = gameMap->mapGrid->height / rows;
 
-    int seedType = 0;
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < sectionHeight; j++)
-        {
-            int rowIndex = i * sectionHeight;
-            for (int k = 0; k < cols; k++)
-            {
-                int colIndex = rowIndex + j;
-                seedType = seed[i * cols + k];
+    int* scaledSeed = ScaleSeed(seed, rows, cols, sectionWidth, sectionHeight);
 
-                for (int m = 0; m < sectionWidth; m++)
-                {
-                    int index = ((colIndex * cols + k) * sectionWidth) + m;
-                    layer.layout[index] = seedType;
-                }
-            }
+    for (int i = 0; i < rows * sectionHeight; i++)
+    {
+        for (int j = 0; j < cols * sectionWidth; j++)
+        {
+            int index = i * cols * sectionWidth + j;
+            layer.layout[index] = scaledSeed[index];
         }
     }
+
+    free(scaledSeed);
 
     return layer;
 }
@@ -207,4 +201,29 @@ Texture2D GetTextureByType(GameMap* gameMap, int type)
     }
 
     return found;
+}
+
+int* ScaleSeed(int* seed, size_t rows, size_t cols, int xScale, int yScale)
+{
+    int* scaledSeed = malloc((rows * yScale * cols * xScale) * sizeof(int));
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < yScale; j++)
+        {
+            int rowIndex = i * yScale;
+            for (int k = 0; k < cols; k++)
+            {
+                int colIndex = rowIndex + j;
+                int seedType = seed[i * cols + k];
+
+                for (int m = 0; m < xScale; m++)
+                {
+                    int index = (colIndex * cols + k) * xScale + m;
+                    scaledSeed[index] = seedType;
+                }
+            }
+        }
+    }
+
+    return scaledSeed;
 }

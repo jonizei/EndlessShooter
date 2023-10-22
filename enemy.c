@@ -132,7 +132,9 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
 void DrawEnemy(Enemy* enemy)
 {
     DrawTextureEx(enemy->texture, enemy->transform.position, 0, enemy->transform.scale, WHITE);
-    DrawBox2D(enemy->hitArea);
+    
+    // Used only for debugging
+    //DrawBox2D(enemy->hitArea);
 
     DrawProjectilePool(enemyProjectilePool, MAX_ENEMY_PROJECTILE);
 }
