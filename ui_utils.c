@@ -2,6 +2,7 @@
 #include "include/raylib.h"
 #include "include/utils.h"
 #include "include/player.h"
+#include "include/raymath.h"
 #include<stdio.h>
 #include<stdlib.h>
 
@@ -14,8 +15,15 @@ typedef struct _ui_healthbar {
     float fillValue;
 } UIHealthbar;
 
+typedef struct _ui_coins {
+    Transform2D transform;
+    Texture2D icon;
+    int count;
+} UICoins;
+
 typedef struct _player_ui {
     UIHealthbar* healthbar;
+    UICoins* coins;
 } PlayerUI;
 
 struct _ui_layer {
@@ -26,11 +34,14 @@ struct _ui_layer {
 Image healthbarBackground;
 Image healthbarFill;
 Image healthbarBorder;
+Image coinUIImage;
 
 // PRIVATE FUNCTION DECLARATIONS
 UIHealthbar* CreateUIHealthbar(float x, float y);
 void DrawUIHealthbar(UIHealthbar* healthbar);
 void DrawUIHealthbarFill(UIHealthbar* healthbar);
+UICoins* CreateUICoins(float x, float y);
+void DrawUICoins(UICoins* uiCoins);
 PlayerUI* CreatePlayerUI();
 void DrawPlayerUI(PlayerUI* playerUi);
 void FreePlayerUI(PlayerUI* playerUi);
@@ -42,6 +53,7 @@ void LoadUIResources()
     healthbarBackground = LoadImage("resources/textures/ui/healthbar_background_sprite.png");
     healthbarFill = LoadImage("resources/textures/ui/healthbar_fill_sprite.png");
     healthbarBorder = LoadImage("resources/textures/ui/healthbar_border_sprite.png");
+    coinUIImage = LoadImage("resources/textures/ui/coin_sprite.png");
 }
 
 void UnloadUIResources()
@@ -49,6 +61,7 @@ void UnloadUIResources()
     UnloadImage(healthbarBackground);
     UnloadImage(healthbarFill);
     UnloadImage(healthbarBorder);
+    UnloadImage(coinUIImage);
 }
 
 UILayer* CreateUILayer()
@@ -121,10 +134,32 @@ void DrawUIHealthbarFill(UIHealthbar* healthbar)
     DrawTexturePro(healthbar->fill, fillSource, fillDest, (Vector2){0, 0}, 0, WHITE);
 }
 
+UICoins* CreateUICoins(float x, float y)
+{
+    UICoins* uiCoins = malloc(sizeof(UICoins));
+    uiCoins->transform.position.x = x;
+    uiCoins->transform.position.y = y;
+    uiCoins->icon = LoadTextureFromImage(coinUIImage);
+    uiCoins->count = 0;
+
+    return uiCoins;
+}
+
+void DrawUICoins(UICoins* uiCoins)
+{
+    char* coinText = IntegerToString(uiCoins->count);
+    Vector2 offset = {26, 0};
+    Vector2 textPosition = Vector2Add(uiCoins->transform.position, offset);
+    DrawTextureV(uiCoins->icon, uiCoins->transform.position, WHITE);
+    DrawText(coinText, textPosition.x, textPosition.y, 20, WHITE);
+    free(coinText);
+}
+
 PlayerUI* CreatePlayerUI()
 {
     PlayerUI* playerUi = (PlayerUI*)malloc(sizeof(PlayerUI));
     playerUi->healthbar = CreateUIHealthbar(10, 10);
+    playerUi->coins = CreateUICoins(10, 52);
     return playerUi;
 }
 
@@ -139,6 +174,11 @@ void UpdatePlayerUI(PlayerUI* playerUi)
             fillValue = player->health / player->maxHealth;
         }
 
+        if (player->coins > 0)
+        {
+            playerUi->coins->count = player->coins;
+        }
+
         playerUi->healthbar->fillValue = fillValue;
     }
 }
@@ -146,10 +186,12 @@ void UpdatePlayerUI(PlayerUI* playerUi)
 void DrawPlayerUI(PlayerUI* playerUi)
 {
     DrawUIHealthbar(playerUi->healthbar);
+    DrawUICoins(playerUi->coins);
 }
 
 void FreePlayerUI(PlayerUI* playerUi)
 {
     free(playerUi->healthbar);
+    free(playerUi->coins);
     MyFree((void**)(&playerUi));
 }

@@ -3,6 +3,7 @@
 #include "include/utils.h"
 #include "include/player.h"
 #include "include/raymath.h"
+#include "include/coin_handler.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -70,6 +71,8 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
     Texture2D texture;
     float hitAreaWidth = 1.0f;
     float hitAreaHeight = 1.0f;
+    int coinDropMin = 1;
+    int coinDropMax = 1;
 
     switch(type)
     {
@@ -84,6 +87,8 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             texture = LoadTextureFromImage(ratEnemyImage);
             hitAreaHeight = 20.0f;
             hitAreaWidth = width * 1.5f;
+            coinDropMin = 1;
+            coinDropMax = 3;
         break;
 
         case ENEMY_GOBLIN:
@@ -95,6 +100,8 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             texture = LoadTextureFromImage(goblinEnemyImage);
             defaultMovementState = ENEMY_STATE_WANDER;
             attackType = ENEMY_ATTACK_SHOOT;
+            coinDropMin = 2;
+            coinDropMax = 4;
         break;
 
     }
@@ -117,6 +124,8 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
     enemy->wanderTargetTime = wanderTargetTime;
     enemy->texture = texture;
     enemy->transform.scale = enemyArea / textureArea;
+    enemy->coinDropMin = coinDropMin;
+    enemy->coinDropMax = coinDropMax;
 
     Vector2 enemyOrigin = GetOrigin(enemy->transform);
     Vector2 hitAreaPosition = {
@@ -158,6 +167,17 @@ void UpdateEnemy(Enemy* enemy)
     EnemyAttack(enemy);
     MoveAllEnemyBullets(enemy);
     CheckPlayerCollisionWithBullets(GetPlayer());
+}
+
+void EnemyDie(Enemy* enemy)
+{
+    int coinCount = GetRandomValue(enemy->coinDropMin, enemy->coinDropMax);
+    for (int i = 0; i < coinCount; i++)
+    {
+        float positionX = GetRandomValue(enemy->transform.position.x, enemy->transform.position.x + enemy->transform.size.x);
+        float positionY = GetRandomValue(enemy->transform.position.y, enemy->transform.position.y + enemy->transform.size.y);
+        AddCoin(positionX, positionY);
+    }
 }
 
 // PRIVATE FUNCTIONS

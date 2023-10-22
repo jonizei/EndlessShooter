@@ -6,6 +6,7 @@
 #include "include/tilegrid.h"
 #include "include/game_map.h"
 #include "include/ui_utils.h"
+#include "include/coin_handler.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 680
@@ -28,6 +29,7 @@ int main()
     LoadGameMapResources();
     LoadPlayerResources();
     LoadEnemyResources();
+    LoadCoinResources();
 
     UILayer* uiLayer = CreateUILayer();
 
@@ -84,6 +86,7 @@ int main()
         UpdateCameraPosition(&camera, GetOrigin(player->transform));
         UpdatePlayer(player);
         CheckEnemyCollision();
+        CheckPlayerCollisionWithCoins(player);
         UpdateEnemies();
         UpdateSpawner(ratSpawner);
         UpdateSpawner(goblinSpawner);
@@ -96,8 +99,9 @@ int main()
             BeginMode2D(camera);
 
                 DrawGameMap(gameMap);
-                DrawPlayer(player);
+                DrawCoins();
                 DrawEnemies();
+                DrawPlayer(player);
 
             EndMode2D();
 
@@ -112,11 +116,13 @@ int main()
     FreePlayer(player);
     FreeGameMap(gameMap);
     FreeUILayer(uiLayer);
+    FreeCoins();
 
     UnloadUIResources();
     UnloadGameMapResources();
     UnloadPlayerResources();
     UnloadEnemyResources();
+    UnloadCoinResources();
 
     return 0;
 }

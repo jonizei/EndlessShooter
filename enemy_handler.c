@@ -61,6 +61,7 @@ void UpdateEnemies()
             }
             else 
             {
+                EnemyDie(enemyPool[i]);
                 RemoveFromEnemyPool(enemyPool[i]->id);
             }
         }

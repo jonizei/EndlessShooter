@@ -2,6 +2,7 @@
 #include "include/raylib.h"
 #include "include/raymath.h"
 #include<math.h>
+#include<string.h>
 
 // CONSTANT VALUES
 const int STRENGTH_MAX_LEVEL = 10;
@@ -191,6 +192,14 @@ float GetStatValue(Stats stats, StatType type)
     }
 
     return statValue;
+}
+
+char* IntegerToString(int value)
+{
+    int length = snprintf(NULL, 0, "%d", value);
+    char* str = calloc(length, sizeof(char));
+    sprintf(str, "%d", value);
+    return str;
 }
 
 // PRIVATE FUNCTIONS

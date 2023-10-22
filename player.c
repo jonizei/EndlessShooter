@@ -69,6 +69,7 @@ Player* CreatePlayer(float x, float y, Stats stats)
     p->stats = stats;
     p->texture = LoadTextureFromImage(playerImage);
 
+    p->coins = 0;
     p->maxHealth = BASE_HEALTH + GetStatValue(stats, STAT_STAMINA); 
     p->health = p->maxHealth;
     p->movementSpeed = BASE_MOVEMENT_SPEED + GetStatValue(stats, STAT_MOVEMENT_SPEED);
@@ -136,6 +137,30 @@ void UpdatePlayerStats(Player* player)
     player->movementSpeed = BASE_MOVEMENT_SPEED + GetStatValue(player->stats, STAT_MOVEMENT_SPEED);
     player->attackSpeed = BASE_ATTACK_SPEED + GetStatValue(player->stats, STAT_ATTACK_SPEED);
     player->damage = BASE_DAMAGE + GetStatValue(player->stats, STAT_STRENGTH);
+}
+
+bool PlayerHasEnoughCoins(Player* player, int amount)
+{
+    return player->coins >= amount;
+}
+
+bool PlayerSpentCoins(Player* player, int amount)
+{
+    if (PlayerHasEnoughCoins(player, amount))
+    {
+        player->coins -= amount;
+        return true;
+    }
+
+    return false;
+}
+
+void PlayerEarnCoins(Player* player, int amount)
+{
+    if (amount > 0) 
+    {
+        player->coins += amount;
+    }
 }
 
 // PRIVATE FUNCTIONS

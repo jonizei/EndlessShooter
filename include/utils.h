@@ -60,5 +60,6 @@ Vector2* Box2DToPoints(Box2D box);
 bool IsInsideBox2D(Box2D box, Vector2 point);
 float degToRad(float degrees);
 float GetStatValue(Stats stats, StatType type);
+char* IntegerToString(int value);
 
 #endif

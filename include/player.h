@@ -14,6 +14,7 @@ typedef struct _player {
     Weapon* weapon;
     Texture2D texture;
     Box2D hitArea;
+    int coins;
     float maxHealth;
     float health;
     float movementSpeed;
@@ -31,5 +32,8 @@ void LoadPlayerResources();
 void UnloadPlayerResources();
 void TakeDamage(Player* player, float damage);
 void UpdatePlayerStats(Player* player);
+bool PlayerHasEnoughCoins(Player* player, int amount);
+bool PlayerSpentCoins(Player* player, int amount);
+void PlayerEarnCoins(Player* player, int amount);
 
 #endif

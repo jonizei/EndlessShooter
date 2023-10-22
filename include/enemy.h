@@ -43,6 +43,8 @@ typedef struct _enemy {
     float wanderTargetTime;
     Vector2 wanderTarget;
     Box2D hitArea;
+    int coinDropMin;
+    int coinDropMax;
 } Enemy;
 
 // GENERAL ENEMY
@@ -54,5 +56,6 @@ void UpdateEnemy(Enemy* enemy);
 void LoadEnemyResources();
 void UnloadEnemyResources();
 Vector2 GetEnemyOrigin(Enemy* enemy);
+void EnemyDie(Enemy* enemy);
 
 #endif
