@@ -72,7 +72,10 @@ void FreeEnemies()
 {
     for (int i = 0; i < MAX_ENEMY; i++)
     {
-        FreeEnemy(enemyPool[i]);
+        if (enemyPool[i] != NULL) 
+        {
+            FreeEnemy(enemyPool[i]);
+        }
     }
 }
 
@@ -92,7 +95,7 @@ EnemySpawner* CreateEnemySpawer(EnemyType enemyType, double spawnTime, int spawn
 
 void FreeEnemySpawner(EnemySpawner* spawner)
 {
-    MyFree(&spawner);
+    MyFree((void**)&spawner);
 }
 
 void UpdateSpawner(EnemySpawner* spawner)

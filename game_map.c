@@ -57,7 +57,7 @@ GameMap* CreateGameMap(int width, int height, float tileWidth, float tileHeight)
     gameMap->height = height * tileHeight;
     gameMap->width = width * tileWidth;
     gameMap->layers = malloc(MAX_LAYERS * sizeof(Layer));
-    memset(gameMap->layers, NULL, MAX_LAYERS * sizeof(Layer));
+    memset(gameMap->layers, 0, MAX_LAYERS * sizeof(Layer));
     gameMap->textureCount = TEXTURE_COUNT;
     gameMap->textures = CreateGameMapTextures(gameMap);
 
@@ -96,7 +96,7 @@ void FreeGameMap(GameMap* gameMap)
     FreeTileGrid(gameMap->mapGrid);
     free(gameMap->layers);
     free(gameMap->textures);
-    MyFree(&gameMap);
+    MyFree((void**)&gameMap);
 }
 
 void DrawGameMap(GameMap* gameMap)

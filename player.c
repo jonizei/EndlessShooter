@@ -2,6 +2,9 @@
 #include "include/raylib.h"
 #include "include/projectile.h"
 #include "include/raymath.h"
+#include "include/merchant.h"
+#include "include/merchant_handler.h"
+#include "include/ui_utils.h"
 
 #define MAX_PROJECTILE 100
 
@@ -21,6 +24,7 @@ const float BASE_DAMAGE = 4.0f;
 const float BASE_HEALTH = 100.0f;
 const float BASE_BULLET_SPEED = 5.0f;
 const float BASE_ATTACK_SPEED = 0.1f;
+const float INTERACT_RADIUS = 32.0f;
 
 // GLOBAL VARIBLES
 Projectile* projectilePool[MAX_PROJECTILE];
@@ -29,6 +33,7 @@ int projectileId = 1;
 Player* playerRef = NULL;
 Image playerImage;
 Image bulletImage;
+Texture2D bulletTexture;
 
 // PRIVATE FUNCTION DECLARATIONS
 void MovePlayer(Player* player);
@@ -38,6 +43,7 @@ void MoveWeapon(Player* player);
 void EnemyCollisionWithBullet(Enemy* enemy, Projectile* bullet);
 void MoveCollider(Player* player);
 bool CanPlayerMove(Player* player, Vector2 position);
+void PlayerInteract(Player* player);
 
 // PUBLIC FUNCTIONS
 
@@ -45,6 +51,8 @@ void LoadPlayerResources()
 {
     playerImage = LoadImage("resources/textures/player_sprite.png");
     bulletImage = LoadImage("resources/textures/bullet_sprite.png");
+
+    bulletTexture = LoadTextureFromImage(bulletImage);
 }
 
 void UnloadPlayerResources()
@@ -93,7 +101,7 @@ void FreePlayer(Player* player)
     UnloadTexture(player->texture);
     FreeProjectilePool(projectilePool, MAX_PROJECTILE);
     FreeWeapon(player->weapon);
-    MyFree(&player);
+    MyFree((void**)&player);
 }
 
 void UpdatePlayer(Player* player)
@@ -102,6 +110,7 @@ void UpdatePlayer(Player* player)
     ShootPlayer(player);
     MoveAllBullets(player);
     MoveWeapon(player);
+    PlayerInteract(player);
 }
 
 void DrawPlayer(Player* player)
@@ -139,20 +148,33 @@ void UpdatePlayerStats(Player* player)
     player->damage = BASE_DAMAGE + GetStatValue(player->stats, STAT_STRENGTH);
 }
 
+void UpgradePlayerStat(Player* player, StatType statType, int points)
+{
+    switch (statType)
+    {
+        case STAT_STRENGTH:
+            
+            break;
+
+        case STAT_MOVEMENT_SPEED:
+            break;
+
+        case STAT_ATTACK_SPEED:
+            break;
+
+        case STAT_STAMINA:
+            break;
+    }
+}
+
 bool PlayerHasEnoughCoins(Player* player, int amount)
 {
     return player->coins >= amount;
 }
 
-bool PlayerSpentCoins(Player* player, int amount)
+void PlayerSpentCoins(Player* player, int amount)
 {
-    if (PlayerHasEnoughCoins(player, amount))
-    {
-        player->coins -= amount;
-        return true;
-    }
-
-    return false;
+    player->coins -= amount;
 }
 
 void PlayerEarnCoins(Player* player, int amount)
@@ -207,12 +229,17 @@ void MovePlayer(Player* player)
 
 void ShootPlayer(Player* player)
 {
+    if (IsUIOpen())
+    {
+        return;
+    }
+
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && projectileCount + 1 < MAX_PROJECTILE)
     {
-        if (GetTime() - player->weapon->lastShot > player->weapon->attackSpeed)
+        if (GetTime() - player->weapon->lastShot > player->attackSpeed)
         {
             Projectile* bullet = CreateProjectile(
-                LoadTextureFromImage(bulletImage)
+                bulletTexture
                 , player->weapon->transform.position.x
                 , player->weapon->transform.position.y
                 , BULLET_WIDTH
@@ -298,4 +325,16 @@ bool CanPlayerMove(Player* player, Vector2 position)
     bool yInside = position.y > 0 && position.y + player->transform.size.y < GetGameMap()->height;
 
     return xInside && yInside;
+}
+
+void PlayerInteract(Player* player)
+{
+    if (IsKeyPressed(KEY_E)) 
+    {
+        Merchant* merchant = FindMerchantInRadius(GetOrigin(player->transform), INTERACT_RADIUS);
+        if (merchant != NULL)
+        {
+            InteractMerchant(merchant);
+        }
+    }
 }

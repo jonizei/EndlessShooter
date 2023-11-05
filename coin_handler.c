@@ -14,6 +14,7 @@ Coin* coinPool[MAX_COINS];
 int coinId = 1;
 int coinCount = 0;
 Image coinImage;
+Texture2D coinTexture;
 
 // PRIVATE FUNCTION DECLARATIONS
 
@@ -22,6 +23,8 @@ Image coinImage;
 void LoadCoinResources()
 {
     coinImage = LoadImage("resources/textures/coin_sprite.png");
+
+    coinTexture = LoadTextureFromImage(coinImage);
 }
 
 void UnloadCoinResources()
@@ -31,7 +34,7 @@ void UnloadCoinResources()
 
 void AddCoin(float x, float y)
 {
-    Coin* coin = CreateCoin(x, y, COIN_WIDTH, COIN_HEIGHT, LoadTextureFromImage(coinImage));
+    Coin* coin = CreateCoin(x, y, COIN_WIDTH, COIN_HEIGHT, coinTexture);
     bool success = AddToCoinPool(coinPool, coin, MAX_COINS);
     if (success)
     {

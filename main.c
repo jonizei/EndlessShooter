@@ -7,6 +7,7 @@
 #include "include/game_map.h"
 #include "include/ui_utils.h"
 #include "include/coin_handler.h"
+#include "include/merchant_handler.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 680
@@ -30,8 +31,10 @@ int main()
     LoadPlayerResources();
     LoadEnemyResources();
     LoadCoinResources();
+    LoadMerchantResources();
 
     UILayer* uiLayer = CreateUILayer();
+    SetMainUILayer(uiLayer);
 
     // 1 = start zone
     // 2 = forest zone
@@ -63,7 +66,7 @@ int main()
         }
     }
 
-    Layer mapLayer = CreateMapLayerFromSeed(gameMap, &mapSeed, 10, 10);
+    Layer mapLayer = CreateMapLayerFromSeed(gameMap, (int*)&mapSeed, 10, 10);
     AddLayer(gameMap, &mapLayer);
     SetGameMap(gameMap);
 
@@ -72,6 +75,7 @@ int main()
     Player* player = CreatePlayer(playerStartPosition.x, playerStartPosition.y, playerBaseStats);
     EnemySpawner* ratSpawner = CreateEnemySpawer(ENEMY_RAT, 3, 100, 350, 350);
     EnemySpawner* goblinSpawner = CreateEnemySpawer(ENEMY_GOBLIN, 5, 100, 200, 450);
+    AddMerchant(200, 200);
 
     Camera2D camera = {0};
     camera.target = GetOrigin(player->transform);
@@ -101,6 +105,7 @@ int main()
                 DrawGameMap(gameMap);
                 DrawCoins();
                 DrawEnemies();
+                DrawMerchants();
                 DrawPlayer(player);
 
             EndMode2D();
@@ -117,12 +122,14 @@ int main()
     FreeGameMap(gameMap);
     FreeUILayer(uiLayer);
     FreeCoins();
+    FreeMerchants();
 
     UnloadUIResources();
     UnloadGameMapResources();
     UnloadPlayerResources();
     UnloadEnemyResources();
     UnloadCoinResources();
+    UnloadMerchantResources();
 
     return 0;
 }

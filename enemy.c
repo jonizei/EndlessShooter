@@ -22,6 +22,9 @@ int enemyProjectileId = 1;
 Image ratEnemyImage;
 Image enemyBulletImage;
 Image goblinEnemyImage;
+Texture2D ratEnemyTexture;
+Texture2D goblinEnemyTexture;
+Texture2D enemyBulletTexture;
 
 // PRIVATE FUNCTION DECLARATIONS
 Enemy* CreateEnemy(int id, int x, int y, int width, int height);
@@ -46,6 +49,10 @@ void LoadEnemyResources()
     ratEnemyImage = LoadImage("resources/textures/rat_enemy_sprite.png");
     enemyBulletImage = LoadImage("resources/textures/bullet_sprite.png");
     goblinEnemyImage = LoadImage("resources/textures/goblin_enemy_sprite.png");
+
+    ratEnemyTexture = LoadTextureFromImage(ratEnemyImage);
+    goblinEnemyTexture = LoadTextureFromImage(goblinEnemyImage);
+    enemyBulletTexture = LoadTextureFromImage(enemyBulletImage);
 }
 
 void UnloadEnemyResources()
@@ -84,7 +91,7 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             attackSpeed = 1.2f;
             defaultMovementState = ENEMY_STATE_WANDER;
             attackType = ENEMY_ATTACK_HIT;
-            texture = LoadTextureFromImage(ratEnemyImage);
+            texture = ratEnemyTexture;
             hitAreaHeight = 20.0f;
             hitAreaWidth = width * 1.5f;
             coinDropMin = 1;
@@ -97,7 +104,7 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             health = 50.0f;
             damage = 5.0f;
             attackSpeed = 1.5f;
-            texture = LoadTextureFromImage(goblinEnemyImage);
+            texture = goblinEnemyTexture;
             defaultMovementState = ENEMY_STATE_WANDER;
             attackType = ENEMY_ATTACK_SHOOT;
             coinDropMin = 2;
@@ -151,7 +158,7 @@ void DrawEnemy(Enemy* enemy)
 void FreeEnemy(Enemy* enemy)
 {
     FreeProjectilePool(enemyProjectilePool, MAX_ENEMY_PROJECTILE);
-    MyFree(&enemy);
+    MyFree((void**)&enemy);
 }
 
 bool IsEnemyAlive(Enemy* enemy)
@@ -337,7 +344,7 @@ void EnemyShootAttack(Enemy* enemy)
     if (IsPlayerInRange(enemy, GetPlayer())) 
     {
         Projectile* bullet = CreateProjectile(
-            LoadTextureFromImage(enemyBulletImage)
+            enemyBulletTexture
             , enemy->transform.position.x
             , enemy->transform.position.y
             , ENEMY_BULLET_WIDTH

@@ -33,7 +33,7 @@ void UnloadPlayerResources();
 void TakeDamage(Player* player, float damage);
 void UpdatePlayerStats(Player* player);
 bool PlayerHasEnoughCoins(Player* player, int amount);
-bool PlayerSpentCoins(Player* player, int amount);
+void PlayerSpentCoins(Player* player, int amount);
 void PlayerEarnCoins(Player* player, int amount);
 
 #endif

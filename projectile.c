@@ -36,7 +36,7 @@ Projectile* CreateProjectile(Texture2D texture, int x, int y, int width, int hei
 
 void FreeProjectile(Projectile* projectile)
 {
-    MyFree(&projectile);
+    MyFree((void**)&projectile);
 }
 
 void MoveProjectile(Projectile* projectile)
@@ -101,7 +101,10 @@ void FreeProjectilePool(Projectile** pool, size_t size)
 {
     for (int i = 0; i < size; i++)
     {
-        FreeProjectile(pool[i]);
+        if (pool[i] != NULL)
+        {
+            FreeProjectile(pool[i]);
+        }
     }
 }
 

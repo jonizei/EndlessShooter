@@ -89,7 +89,10 @@ void FreeCoinPool(Coin** pool, size_t size)
 {
     for (int i = 0; i < size; i++)
     {
-        FreeCoin(pool[i]);
+        if (pool[i] != NULL)
+        {
+            FreeCoin(pool[i]);
+        }
     }
 }
 

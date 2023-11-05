@@ -16,7 +16,7 @@ Weapon* CreateWeapon(float speed, float attackSpeed)
 
 void FreeWeapon(Weapon* weapon)
 {
-    MyFree(&weapon);
+    MyFree((void**)&weapon);
 }
 
 // PRIVATE FUNCTIONS

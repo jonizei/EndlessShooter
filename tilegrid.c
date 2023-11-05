@@ -35,7 +35,7 @@ TileGrid* CreateTileGrid(int x, int y, int width, int height, float tileWidth, f
 
 void FreeTileGrid(TileGrid* grid)
 {
-    MyFree(&grid);
+    MyFree((void**)&grid);
 }
 
 void DrawTileGrid(TileGrid* grid)
