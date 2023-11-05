@@ -59,7 +59,11 @@ void DrawBox2D(Box2D box);
 Vector2* Box2DToPoints(Box2D box);
 bool IsInsideBox2D(Box2D box, Vector2 point);
 float degToRad(float degrees);
+const char* GetStatTypeText(StatType type);
 float GetStatValue(Stats stats, StatType type);
+bool IsStatMaxLevel(Stats stats, StatType statType);
+void UpdateStatPoint(Stats* stats, StatType statType, int points);
 char* IntegerToString(int value);
+void DrawTextureBySize(Texture2D, Vector2 position, Vector2 size);
 
 #endif

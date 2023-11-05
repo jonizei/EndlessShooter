@@ -15,6 +15,11 @@ const float MOVEMENT_SPEED_FACTOR = 0.25f;
 const float ATTACK_SPEED_FACTOR = 0.1f;
 const float STAMINA_FACTOR = 50;
 
+const char* STRENGTH_TEXT = "STR";
+const char* MOVEMENT_SPEED_TEXT = "MSPD";
+const char* ATTACK_SPEED_TEXT = "ASPD";
+const char* STAMINA_TEXT = "STAM";
+
 // GLOBAL VARIABLES
 Camera2D* _CameraRef = NULL;
 GameMap * _GameMapRef = NULL;
@@ -157,6 +162,31 @@ float degToRad(float degrees)
     return degrees * DEG2RAD;
 }
 
+const char* GetStatTypeText(StatType type)
+{
+    const char* text = "";
+    switch(type)
+    {
+        case STAT_STRENGTH:
+            text = STRENGTH_TEXT;
+        break;
+
+        case STAT_MOVEMENT_SPEED:
+            text = MOVEMENT_SPEED_TEXT;
+        break;
+
+        case STAT_ATTACK_SPEED:
+            text = ATTACK_SPEED_TEXT;
+        break;
+
+        case STAT_STAMINA:
+            text = STAMINA_TEXT;
+        break;
+    }
+
+    return text;
+}
+
 float GetStatValue(Stats stats, StatType type)
 {
     float statValue = 0;
@@ -194,12 +224,90 @@ float GetStatValue(Stats stats, StatType type)
     return statValue;
 }
 
+bool IsStatMaxLevel(Stats stats, StatType statType)
+{
+    bool isMaxLevel = false;
+    switch(statType)
+    {
+        case STAT_STRENGTH:
+            isMaxLevel = stats.strength == STRENGTH_MAX_LEVEL;
+        break;
+
+        case STAT_MOVEMENT_SPEED:
+            isMaxLevel = stats.movementSpeed == MOVEMENT_SPEED_MAX_LEVEL;
+        break;
+
+        case STAT_ATTACK_SPEED:
+            isMaxLevel = stats.attackSpeed == ATTACK_SPEED_MAX_LEVEL;
+        break;
+
+        case STAT_STAMINA:
+            isMaxLevel = stats.stamina == STAMINA_MAX_LEVEL;
+        break;
+    }
+
+    return isMaxLevel;
+}
+
+void UpdateStatPoint(Stats* stats, StatType statType, int points)
+{
+    switch(statType) 
+    {
+        case STAT_STRENGTH:
+            if (stats->strength + points <= STRENGTH_MAX_LEVEL) 
+            {
+                stats->strength += points;
+            }
+        break;
+
+        case STAT_MOVEMENT_SPEED:
+            if (stats->movementSpeed + points <= MOVEMENT_SPEED_MAX_LEVEL) 
+            {
+                stats->movementSpeed += points;
+            }
+        break;
+
+        case STAT_ATTACK_SPEED:
+            if (stats->attackSpeed + points <= ATTACK_SPEED_MAX_LEVEL) 
+            {
+                stats->attackSpeed += points;
+            }
+        break;
+
+        case STAT_STAMINA:
+            if (stats->stamina + points <= STAMINA_MAX_LEVEL)
+            {
+                stats->stamina += points;
+            }
+        break;
+    }
+}
+
 char* IntegerToString(int value)
 {
     int length = snprintf(NULL, 0, "%d", value);
-    char* str = calloc(length, sizeof(char));
+    char* str = calloc(length + 1, sizeof(char));
     sprintf(str, "%d", value);
     return str;
+}
+
+void DrawTextureBySize(Texture2D texture, Vector2 position, Vector2 size)
+{
+    Rectangle source = {
+        0,
+        0,
+        texture.width,
+        texture.height
+    };
+
+    Rectangle destination = {
+        position.x,
+        position.y,
+        size.x,
+        size.y
+    };
+
+    DrawTexturePro(texture, source, destination, (Vector2){0, 0}, 0, WHITE);
 }
 
 // PRIVATE FUNCTIONS
