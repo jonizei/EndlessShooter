@@ -91,6 +91,15 @@ Vector2 GetPositionInDistance(Vector2 position, float distance, float direction)
     return (Vector2){ x, y };
 }
 
+Vector2 GetOffsetPositionInDistance(Vector2 position, float offset, float distance, float direction)
+{
+    float sideA = offset;
+    float sideB = distance;
+    float angle = pow(tan(sideA / sideB), -1);
+    float length = sqrt(pow(sideA, 2) + pow(sideB, 2));
+    return GetPositionInDistance(position, length, direction + angle);
+}
+
 Box2D CreateBox2D(Vector2 position, float width, float height, float direction)
 {
     Vector2 corner = {
@@ -160,6 +169,11 @@ bool IsInsideBox2D(Box2D box, Vector2 point)
 float degToRad(float degrees)
 {
     return degrees * DEG2RAD;
+}
+
+float radToDeg(float radians)
+{
+    return radians / DEG2RAD;
 }
 
 const char* GetStatTypeText(StatType type)
@@ -291,13 +305,13 @@ char* IntegerToString(int value)
     return str;
 }
 
-void DrawTextureBySize(Texture2D texture, Vector2 position, Vector2 size)
+void DrawTextureBySize(Texture2D texture, Vector2 position, Vector2 size, float rotation, bool flipX, bool flipY)
 {
     Rectangle source = {
         0,
         0,
-        texture.width,
-        texture.height
+        flipX == true ? -texture.width : texture.width,
+        flipY == true ? -texture.height : texture.height
     };
 
     Rectangle destination = {
@@ -307,7 +321,7 @@ void DrawTextureBySize(Texture2D texture, Vector2 position, Vector2 size)
         size.y
     };
 
-    DrawTexturePro(texture, source, destination, (Vector2){0, 0}, 0, WHITE);
+    DrawTexturePro(texture, source, destination, (Vector2){0, 0}, rotation, WHITE);
 }
 
 // PRIVATE FUNCTIONS

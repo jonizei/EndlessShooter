@@ -12,6 +12,7 @@ typedef struct _transform2d {
     Vector2 position;
     Vector2 size;
     float scale;
+    float rotation;
 } Transform2D;
 
 typedef struct _box2d {
@@ -52,6 +53,7 @@ Vector2 GetWorldPosition(Vector2 position);
 float GetMouseDirection(Vector2 position);
 float GetDirection(Vector2 from, Vector2 to);
 Vector2 GetPositionInDistance(Vector2 position, float distance, float direction);
+Vector2 GetOffsetPositionInDistance(Vector2 position, float offset, float distance, float direction);
 Box2D CreateBox2D(Vector2 position, float width, float height, float direction);
 Box2D RotateBox2D(Box2D box, float direction);
 Box2D MoveBox2D(Box2D box, Vector2 position);
@@ -59,11 +61,12 @@ void DrawBox2D(Box2D box);
 Vector2* Box2DToPoints(Box2D box);
 bool IsInsideBox2D(Box2D box, Vector2 point);
 float degToRad(float degrees);
+float radToDeg(float radians);
 const char* GetStatTypeText(StatType type);
 float GetStatValue(Stats stats, StatType type);
 bool IsStatMaxLevel(Stats stats, StatType statType);
 void UpdateStatPoint(Stats* stats, StatType statType, int points);
 char* IntegerToString(int value);
-void DrawTextureBySize(Texture2D, Vector2 position, Vector2 size);
+void DrawTextureBySize(Texture2D texture, Vector2 position, Vector2 size, float rotation, bool flipX, bool flipY);
 
 #endif

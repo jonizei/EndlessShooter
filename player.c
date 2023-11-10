@@ -18,13 +18,15 @@ const int BUTTON_RIGHT = KEY_D;
 const int HEIGHT = 16;
 const int WIDTH = 16;
 const float BASE_MOVEMENT_SPEED = 1.0f;
-const int BULLET_HEIGHT = 10;
-const int BULLET_WIDTH = 10;
+const int BULLET_HEIGHT = 6;
+const int BULLET_WIDTH = 6;
 const float BASE_DAMAGE = 4.0f;
 const float BASE_HEALTH = 100.0f;
 const float BASE_BULLET_SPEED = 5.0f;
 const float BASE_ATTACK_SPEED = 0.1f;
 const float INTERACT_RADIUS = 32.0f;
+const int WEAPON_WIDTH = 12;
+const int WEAPON_HEIGHT = 12;
 
 // GLOBAL VARIBLES
 Projectile* projectilePool[MAX_PROJECTILE];
@@ -33,7 +35,10 @@ int projectileId = 1;
 Player* playerRef = NULL;
 Image playerImage;
 Image bulletImage;
+Image weaponImage;
+Texture2D playerTexture;
 Texture2D bulletTexture;
+Texture2D weaponTexture;
 
 // PRIVATE FUNCTION DECLARATIONS
 void MovePlayer(Player* player);
@@ -51,20 +56,22 @@ void LoadPlayerResources()
 {
     playerImage = LoadImage("resources/textures/player_sprite.png");
     bulletImage = LoadImage("resources/textures/bullet_sprite.png");
+    weaponImage = LoadImage("resources/textures/gun_sprite.png");
 
+    playerTexture = LoadTextureFromImage(playerImage);
     bulletTexture = LoadTextureFromImage(bulletImage);
+    weaponTexture = LoadTextureFromImage(weaponImage);
 }
 
 void UnloadPlayerResources()
 {
     UnloadImage(playerImage);
     UnloadImage(bulletImage);
+    UnloadImage(weaponImage);
 }
 
 Player* CreatePlayer(float x, float y, Stats stats)
 {
-    float playerArea = WIDTH * HEIGHT;
-
     Player* p = malloc(sizeof(Player));
     p->transform.position.x = x;
     p->transform.position.y = y;
@@ -75,7 +82,7 @@ Player* CreatePlayer(float x, float y, Stats stats)
     p->collider.width = WIDTH;
     p->collider.height = HEIGHT;
     p->stats = stats;
-    p->texture = LoadTextureFromImage(playerImage);
+    p->texture = playerTexture;
 
     p->coins = 0;
     p->maxHealth = BASE_HEALTH + GetStatValue(stats, STAT_STAMINA); 
@@ -84,11 +91,7 @@ Player* CreatePlayer(float x, float y, Stats stats)
     p->attackSpeed = BASE_ATTACK_SPEED + GetStatValue(stats, STAT_ATTACK_SPEED);
     p->damage = BASE_DAMAGE + GetStatValue(stats, STAT_STRENGTH);
 
-    p->weapon = CreateWeapon(BASE_BULLET_SPEED, p->attackSpeed);
-    p->weapon->offset = WIDTH;
-
-    float textureArea = p->texture.height * p->texture.width;
-    p->transform.scale = playerArea / textureArea;
+    p->weapon = CreateWeapon(weaponTexture, WEAPON_WIDTH, WEAPON_HEIGHT, BASE_BULLET_SPEED, p->attackSpeed);
 
     free(playerRef);
     playerRef = p;
@@ -115,7 +118,8 @@ void UpdatePlayer(Player* player)
 
 void DrawPlayer(Player* player)
 {
-    DrawTextureEx(player->texture, player->transform.position, 0, player->transform.scale, WHITE);
+    DrawTextureBySize(player->texture, player->transform.position, player->transform.size, 0, false, false);
+    DrawWeapon(player->weapon);
     DrawProjectilePool(projectilePool, MAX_PROJECTILE);
 }
 
@@ -240,18 +244,22 @@ void ShootPlayer(Player* player)
         {
             Projectile* bullet = CreateProjectile(
                 bulletTexture
-                , player->weapon->transform.position.x
-                , player->weapon->transform.position.y
+                , player->weapon->barrelPoint.x
+                , player->weapon->barrelPoint.y
                 , BULLET_WIDTH
                 , BULLET_HEIGHT
                 , player->weapon->speed
                 , 0
             );
 
+            float mouseAngle = Vector2Angle(player->weapon->barrelPoint, GetMouseWorldPosition());
             bullet->id = projectileId;
-            bullet->direction = GetMouseDirection(bullet->transform.position);
-            bullet->angle = 180 + Vector2Angle(player->weapon->transform.position, GetMouseWorldPosition());
+            bullet->direction = degToRad(mouseAngle);
+            bullet->transform.rotation = mouseAngle;
             bullet->damage = player->damage;
+
+            Vector2 offsetPosition = GetOffsetPositionInDistance(player->weapon->barrelPoint, bullet->transform.size.y / 2, 1, degToRad(mouseAngle));
+            bullet->transform.position = offsetPosition;
 
             bool success = AddToProjectilePool(projectilePool, bullet, MAX_PROJECTILE);
 
@@ -288,14 +296,26 @@ void MoveAllBullets(Player* player)
 
 void MoveWeapon(Player* player)
 {
-    Vector2 playerOrigin = {
-        player->transform.position.x + player->transform.size.x / 2,
-        player->transform.position.y + player->transform.size.y / 2
-    };
+    Vector2 playerOrigin = GetOrigin(player->transform);
+    float weaponWidth = player->weapon->transform.size.x;
+    float weaponHeight = player->weapon->transform.size.y;
 
-    float direction = GetMouseDirection(playerOrigin);
-    Vector2 position = GetPositionInDistance(playerOrigin, player->weapon->offset, direction);
+    float mouseAngle = Vector2Angle(playerOrigin, GetMouseWorldPosition());
+    Vector2 position = GetOffsetPositionInDistance(playerOrigin, -weaponHeight / 2, player->weapon->offset, degToRad(mouseAngle));
+
     player->weapon->transform.position = position;
+    player->weapon->transform.rotation = Vector2Angle(playerOrigin, GetMouseWorldPosition());
+
+    if (mouseAngle > 90 && mouseAngle < 270)
+    {
+        player->weapon->flipped = true;
+    }
+    else {
+        player->weapon->flipped = false;
+    }
+
+    float distance = player->weapon->offset + weaponWidth;
+    player->weapon->barrelPoint = GetPositionInDistance(playerOrigin, distance, degToRad(mouseAngle));
 }
 
 void MoveCollider(Player* player)

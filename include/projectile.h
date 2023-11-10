@@ -12,7 +12,6 @@ typedef struct _projectile {
     Texture2D texture;
     float movementSpeed;
     float direction;
-    float angle;
     int damage;
 } Projectile;
 

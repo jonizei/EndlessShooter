@@ -224,7 +224,7 @@ void DrawUIHealthbar(UIHealthbar* healthbar)
 
 void DrawUIHealthbarFill(UIHealthbar* healthbar)
 {
-   DrawTextureBySize(healthbar->fill, healthbar->transform.position, healthbar->transform.size);
+   DrawTextureBySize(healthbar->fill, healthbar->transform.position, healthbar->transform.size, 0, false, false);
 }
 
 UICoins* CreateUICoins(float x, float y)
@@ -465,7 +465,7 @@ void DrawMerchantUI(MerchantUI* merchantUi)
         return;
     }
 
-    DrawTextureBySize(merchantUi->background, merchantUi->transform.position, merchantUi->transform.size);
+    DrawTextureBySize(merchantUi->background, merchantUi->transform.position, merchantUi->transform.size, 0, false, false);
     DrawUIButton(merchantUi->exitButton);
 
     for (int i = 0; i < 4; i++)
@@ -509,11 +509,11 @@ void DrawUIButton(UIButton* uiButton)
 {
     if (uiButton->isPressed) 
     {
-        DrawTextureBySize(uiButton->pressedBackground, uiButton->transform.position, uiButton->transform.size);
+        DrawTextureBySize(uiButton->pressedBackground, uiButton->transform.position, uiButton->transform.size, 0, false, false);
     } 
     else 
     {
-        DrawTextureBySize(uiButton->background, uiButton->transform.position, uiButton->transform.size);
+        DrawTextureBySize(uiButton->background, uiButton->transform.position, uiButton->transform.size, 0, false, false);
     }
 }
 

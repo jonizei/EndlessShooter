@@ -11,8 +11,8 @@
 #define MAX_ENEMY_PROJECTILE 500
 
 // CONSTANT VALUES
-const int ENEMY_BULLET_WIDTH = 10;
-const int ENEMY_BULLET_HEIGHT = 10;
+const int ENEMY_BULLET_WIDTH = 6;
+const int ENEMY_BULLET_HEIGHT = 6;
 const float ENEMY_BULLET_SPEED = 1.5f;
 
 // GLOBAL VARIABLES
@@ -355,7 +355,7 @@ void EnemyShootAttack(Enemy* enemy)
 
         bullet->id = enemyProjectileId;
         bullet->direction = GetDirection(enemy->transform.position, GetPlayer()->transform.position);
-        bullet->angle = 180 + Vector2Angle(enemy->transform.position, GetPlayer()->transform.position);
+        bullet->transform.rotation = radToDeg(bullet->direction);
         bullet->damage = 10;
 
         bool success = AddToProjectilePool(enemyProjectilePool, bullet, MAX_ENEMY_PROJECTILE);
