@@ -13,7 +13,7 @@ Weapon* CreateWeapon(Texture2D texture, int width, int height, float speed, floa
     w->speed = speed;
     w->attackSpeed = attackSpeed;
     w->lastShot = 0;
-    w->offset = 6;
+    w->offset = 0;
     w->flipped = false;
 
     return w;

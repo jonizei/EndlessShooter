@@ -92,6 +92,7 @@ Player* CreatePlayer(float x, float y, Stats stats)
     p->damage = BASE_DAMAGE + GetStatValue(stats, STAT_STRENGTH);
 
     p->weapon = CreateWeapon(weaponTexture, WEAPON_WIDTH, WEAPON_HEIGHT, BASE_BULLET_SPEED, p->attackSpeed);
+    p->weapon->offset = 6;
 
     free(playerRef);
     playerRef = p;
@@ -301,7 +302,7 @@ void MoveWeapon(Player* player)
     float weaponHeight = player->weapon->transform.size.y;
 
     float mouseAngle = Vector2Angle(playerOrigin, GetMouseWorldPosition());
-    Vector2 position = GetOffsetPositionInDistance(playerOrigin, -weaponHeight / 2, player->weapon->offset, degToRad(mouseAngle));
+    Vector2 position = GetOffsetPositionInDistance(playerOrigin, weaponHeight / 2, player->weapon->offset, degToRad(mouseAngle));
 
     player->weapon->transform.position = position;
     player->weapon->transform.rotation = Vector2Angle(playerOrigin, GetMouseWorldPosition());

@@ -93,11 +93,9 @@ Vector2 GetPositionInDistance(Vector2 position, float distance, float direction)
 
 Vector2 GetOffsetPositionInDistance(Vector2 position, float offset, float distance, float direction)
 {
-    float sideA = offset;
-    float sideB = distance;
-    float angle = pow(tan(sideA / sideB), -1);
-    float length = sqrt(pow(sideA, 2) + pow(sideB, 2));
-    return GetPositionInDistance(position, length, direction + angle);
+    float offsetDirection = direction + radToDeg(90);
+    Vector2 offsetPosition = GetPositionInDistance(position, offset, offsetDirection);
+    return GetPositionInDistance(offsetPosition, distance, direction);
 }
 
 Box2D CreateBox2D(Vector2 position, float width, float height, float direction)
