@@ -5,6 +5,8 @@
 #include "projectile.h"
 #include "utils.h"
 
+#define MAX_ENEMY_PROJECTILE 100
+
 typedef enum {
     ENEMY_RAT,
     ENEMY_GOBLIN
@@ -29,6 +31,7 @@ typedef struct _enemy {
     Rectangle collider;
     Vector2 startPosition;
     Texture2D texture;
+    Projectile* projectilePool[MAX_ENEMY_PROJECTILE];
     float health;
     float damage;
     float attackSpeed;

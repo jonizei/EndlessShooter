@@ -20,6 +20,7 @@ void FreeProjectile(Projectile* projectile);
 void MoveProjectile(Projectile* projectile);
 void DrawProjectilePool(Projectile** pool, size_t size);
 void DrawProjectile(Projectile* projectile);
+void ClearProjectilePool(Projectile** pool, size_t size);
 bool AddToProjectilePool(Projectile** pool, Projectile* projectile, size_t size);
 bool RemoveFromProjectilePool(Projectile** pool, int id, size_t size);
 void FreeProjectilePool(Projectile** pool, size_t size);

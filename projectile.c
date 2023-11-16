@@ -58,6 +58,14 @@ void DrawProjectile(Projectile* projectile)
     DrawTextureBySize(projectile->texture, projectile->transform.position, projectile->transform.size, projectile->transform.rotation, false, false);
 }
 
+void ClearProjectilePool(Projectile** pool, size_t size)
+{
+    for(int i = 0; i < size; i++)
+    {
+        pool[i] = NULL;
+    }
+}
+
 bool AddToProjectilePool(Projectile** pool, Projectile* projectile, size_t size)
 {
     bool success = false;

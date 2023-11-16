@@ -101,7 +101,7 @@ MerchantUIButton** CreateMerchantUIButtons(float x, float y, float width, float 
 void DrawMerchantUIButton(MerchantUIButton* merchantButton);
 void FreeMerchantUIButton(MerchantUIButton* merchantButton);
 void UpdateMerchantUI(MerchantUI* merchantUi);
-void ClickMerchantUIButton(MerchantUIButton* merchantButton);
+void ClickMerchantUIButton(MerchantUI* merchantUi, MerchantUIButton* merchantButton);
 void UpdateMerchantUIButtons(MerchantUI* merchantUi);
 
 // PUBLIC FUNCTIONS
@@ -224,7 +224,11 @@ void DrawUIHealthbar(UIHealthbar* healthbar)
 
 void DrawUIHealthbarFill(UIHealthbar* healthbar)
 {
-   DrawTextureBySize(healthbar->fill, healthbar->transform.position, healthbar->transform.size, 0, false, false);
+    Vector2 size = {
+        healthbar->transform.size.x * healthbar->fillValue,
+        healthbar->transform.size.y
+    };
+    DrawTextureBySize(healthbar->fill, healthbar->transform.position, size, 0, false, false);
 }
 
 UICoins* CreateUICoins(float x, float y)
@@ -341,7 +345,7 @@ void UpdateMerchantUI(MerchantUI* merchantUi)
             bool buttonClicked = CheckCollisionPointRec(GetMousePosition(), merchantUi->buttons[i]->button->collider);
             if (buttonClicked)
             {
-                ClickMerchantUIButton(merchantUi->buttons[i]);
+                ClickMerchantUIButton(merchantUi, merchantUi->buttons[i]);
             }
         }
     }
@@ -419,16 +423,23 @@ void UpdateMerchantUIButtons(MerchantUI* merchantUi)
     }
 }
 
-void ClickMerchantUIButton(MerchantUIButton* merchantButton)
+void ClickMerchantUIButton(MerchantUI* merchantUi, MerchantUIButton* merchantButton)
 {
+    if (merchantUi == NULL || merchantButton == NULL)
+    {
+        return;
+    }
+
     merchantButton->button->isPressed = true;
     Player* player = GetPlayer();
 
-    if (PlayerHasEnoughCoins(player, merchantButton->price) && IsStatMaxLevel(player->stats, merchantButton->statType))
+    if (PlayerHasEnoughCoins(player, merchantButton->price) && !IsStatMaxLevel(player->stats, merchantButton->statType))
     {
         PlayerSpentCoins(player, merchantButton->price);
         UpdateStatPoint(&(player->stats), merchantButton->statType, merchantButton->points);
         UpdatePlayerStats(player);
+        UpdateMerchantItem(merchantUi->activeMerchant, merchantButton->statType, merchantButton->points);
+        UpdateMerchantUIButtons(merchantUi);
     }
 }
 

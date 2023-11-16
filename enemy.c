@@ -8,16 +8,12 @@
 #include<stdlib.h>
 #include<string.h>
 
-#define MAX_ENEMY_PROJECTILE 500
-
 // CONSTANT VALUES
 const int ENEMY_BULLET_WIDTH = 6;
 const int ENEMY_BULLET_HEIGHT = 6;
 const float ENEMY_BULLET_SPEED = 1.5f;
 
 // GLOBAL VARIABLES
-Projectile* enemyProjectilePool[MAX_ENEMY_PROJECTILE];
-int enemyProjectileCount = 0;
 int enemyProjectileId = 1;
 Image ratEnemyImage;
 Image enemyBulletImage;
@@ -39,8 +35,8 @@ void EnemyHitAttack(Enemy* enemy);
 void EnemyShootAttack(Enemy* enemy);
 void MoveEnemyCollider(Enemy* enemy);
 void MoveAllEnemyBullets(Enemy* enemy);
-void CheckPlayerCollisionWithBullets(Player* player);
-void PlayerCollisionWithBullet(Player* player, Projectile* bullet);
+void CheckPlayerCollisionWithBullets(Enemy* enemy, Player* player);
+void PlayerCollisionWithBullet(Enemy* enemy, Player* player, Projectile* bullet);
 
 // PUBLIC FUNCTIONS
 
@@ -74,7 +70,7 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
     float sightRadius = 200;
     float wanderRadius = 150.0;
     float wanderTargetTime = 5.0;
-    float movementSpeed = 1.0;
+    float movementSpeed = 1.0f;
     Texture2D texture;
     float hitAreaWidth = 1.0f;
     float hitAreaHeight = 1.0f;
@@ -87,8 +83,9 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             width = 16;
             height = 16;
             health = 30.0f;
-            damage = 5.0f;
-            attackSpeed = 1.2f;
+            damage = 3.0f;
+            attackSpeed = 1.3f;
+            movementSpeed = 1.0f;
             defaultMovementState = ENEMY_STATE_WANDER;
             attackType = ENEMY_ATTACK_HIT;
             texture = ratEnemyTexture;
@@ -102,8 +99,9 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             width = 16;
             height = 16;
             health = 50.0f;
-            damage = 5.0f;
-            attackSpeed = 1.5f;
+            damage = 8.0f;
+            attackSpeed = 1.8f;
+            movementSpeed = 0.7f;
             texture = goblinEnemyTexture;
             defaultMovementState = ENEMY_STATE_WANDER;
             attackType = ENEMY_ATTACK_SHOOT;
@@ -152,12 +150,12 @@ void DrawEnemy(Enemy* enemy)
     // Used only for debugging
     //DrawBox2D(enemy->hitArea);
 
-    DrawProjectilePool(enemyProjectilePool, MAX_ENEMY_PROJECTILE);
+    DrawProjectilePool(enemy->projectilePool, MAX_ENEMY_PROJECTILE);
 }
 
 void FreeEnemy(Enemy* enemy)
 {
-    FreeProjectilePool(enemyProjectilePool, MAX_ENEMY_PROJECTILE);
+    FreeProjectilePool(enemy->projectilePool, MAX_ENEMY_PROJECTILE);
     MyFree((void**)&enemy);
 }
 
@@ -173,7 +171,7 @@ void UpdateEnemy(Enemy* enemy)
     MoveHitArea(enemy);
     EnemyAttack(enemy);
     MoveAllEnemyBullets(enemy);
-    CheckPlayerCollisionWithBullets(GetPlayer());
+    CheckPlayerCollisionWithBullets(enemy, GetPlayer());
 }
 
 void EnemyDie(Enemy* enemy)
@@ -205,6 +203,7 @@ Enemy* CreateEnemy(int id, int x, int y, int width, int height)
     enemy->collider.height = height;
     enemy->health = 0;
     enemy->lastTarget = 0;
+    ClearProjectilePool(enemy->projectilePool, MAX_ENEMY_PROJECTILE);
 
     return enemy;
 }
@@ -358,12 +357,11 @@ void EnemyShootAttack(Enemy* enemy)
         bullet->transform.rotation = radToDeg(bullet->direction);
         bullet->damage = 10;
 
-        bool success = AddToProjectilePool(enemyProjectilePool, bullet, MAX_ENEMY_PROJECTILE);
+        bool success = AddToProjectilePool(enemy->projectilePool, bullet, MAX_ENEMY_PROJECTILE);
 
         if (success) 
         {
             enemyProjectileId++;
-            enemyProjectileCount++;
             enemy->lastAttack = GetTime();
         }
     }
@@ -379,45 +377,37 @@ void MoveAllEnemyBullets(Enemy* enemy)
 {
     for (int i = 0; i < MAX_ENEMY_PROJECTILE; i++)
     {
-        if (enemyProjectilePool[i] != NULL) 
+        if (enemy->projectilePool[i] != NULL) 
         {
-            MoveProjectile(enemyProjectilePool[i]);
+            MoveProjectile(enemy->projectilePool[i]);
 
-            float distance = Vector2Distance(enemy->transform.position, enemyProjectilePool[i]->transform.position);
+            float distance = Vector2Distance(enemy->transform.position, enemy->projectilePool[i]->transform.position);
             if (distance > GetScreenWidth()) 
             {
-                bool success = RemoveFromProjectilePool(enemyProjectilePool, enemyProjectilePool[i]->id, MAX_ENEMY_PROJECTILE);
-                if (success)
-                {
-                    enemyProjectileCount--;
-                }
+                RemoveFromProjectilePool(enemy->projectilePool, enemy->projectilePool[i]->id, MAX_ENEMY_PROJECTILE);
             }
         }
     }
 }
 
-void CheckPlayerCollisionWithBullets(Player* player)
+void CheckPlayerCollisionWithBullets(Enemy* enemy, Player* player)
 {
     for (int i = 0; i < MAX_ENEMY_PROJECTILE; i++)
     {
-        if (enemyProjectilePool[i] != NULL)
+        if (enemy->projectilePool[i] != NULL)
         {
-            PlayerCollisionWithBullet(player, enemyProjectilePool[i]);
+            PlayerCollisionWithBullet(enemy, player, enemy->projectilePool[i]);
         }
     }
 }
 
-void PlayerCollisionWithBullet(Player* player, Projectile* bullet)
+void PlayerCollisionWithBullet(Enemy* enemy, Player* player, Projectile* bullet)
 {
     bool collides = CheckCollisionRecs(bullet->collider, player->collider);
 
     if (collides)
     {
         TakeDamage(player, bullet->damage);
-        bool success = RemoveFromProjectilePool(enemyProjectilePool, bullet->id, MAX_ENEMY_PROJECTILE);
-        if (success)
-        {
-            enemyProjectileCount--;
-        }
+        RemoveFromProjectilePool(enemy->projectilePool, bullet->id, MAX_ENEMY_PROJECTILE);
     }
 }

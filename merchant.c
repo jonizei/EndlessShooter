@@ -12,10 +12,10 @@ const int MOVEMENT_BASE_PRICE = 5;
 const int ATTACK_SPEED_BASE_PRICE = 5;
 const int STAMINA_BASE_PRICE = 5;
 
-const int STRENGTH_BASE_RAISE = 2;
-const int MOVEMENT_BASE_RAISE = 2;
-const int ATTACK_SPEED_BASE_RAISE = 2;
-const int STAMINA_BASE_RAISE = 2;
+const int STRENGTH_BASE_RAISE = 7;
+const int MOVEMENT_BASE_RAISE = 3;
+const int ATTACK_SPEED_BASE_RAISE = 5;
+const int STAMINA_BASE_RAISE = 5;
 
 // GLOBAL VARIABLES
 Image merchantImage;
@@ -52,25 +52,6 @@ Merchant* CreateMerchant(float x, float y)
     return merchant;
 }
 
-MerchantItem* CreateMerchantItem(StatType type, int price, int points)
-{
-    MerchantItem* item = malloc(sizeof(MerchantItem));
-    item->statType = type;
-    item->price = price;
-    item->points = points;
-    return item;
-}
-
-MerchantItem** CreateMerchantItems()
-{
-    MerchantItem** items = malloc(4 * sizeof(MerchantItem*));
-    items[0] = CreateMerchantItem(STAT_STRENGTH, STRENGTH_BASE_PRICE, 1);
-    items[1] = CreateMerchantItem(STAT_MOVEMENT_SPEED, MOVEMENT_BASE_PRICE, 1);
-    items[2] = CreateMerchantItem(STAT_ATTACK_SPEED, ATTACK_SPEED_BASE_PRICE, 1);
-    items[3] = CreateMerchantItem(STAT_STAMINA, STAMINA_BASE_PRICE, 1);
-    return items;
-}
-
 void FreeMerchantItem(MerchantItem* item)
 {
     MyFree((void**)&item);
@@ -90,6 +71,45 @@ void FreeMerchant(Merchant* merchant)
     }
     MyFree((void**)&(merchant->items));
     MyFree((void**)&merchant);
+}
+
+void UpdateMerchantItem(Merchant* merchant, StatType statType, int points)
+{
+    if (merchant == NULL)
+    {
+        return;
+    }
+
+    switch(statType)
+    {
+        case STAT_STRENGTH:
+            if (merchant->items[0] != NULL)
+            {
+                merchant->items[0]->price += STRENGTH_BASE_RAISE * points;
+            }
+        break;
+
+        case STAT_MOVEMENT_SPEED:
+            if (merchant->items[1] != NULL)
+            {
+                merchant->items[1]->price += MOVEMENT_BASE_RAISE * points;
+            }
+        break;
+
+        case STAT_ATTACK_SPEED:
+            if (merchant->items[2] != NULL)
+            {
+                merchant->items[2]->price += ATTACK_SPEED_BASE_RAISE * points;
+            }
+        break;
+
+        case STAT_STAMINA:
+            if (merchant->items[3] != NULL)
+            {
+                merchant->items[3]->price += STAMINA_BASE_RAISE * points;
+            }
+        break;
+    }
 }
 
 bool AddToMerchantPool(Merchant** pool, Merchant* merchant, size_t size)
@@ -149,3 +169,22 @@ void FreeMerchantPool(Merchant** pool, size_t size)
 }
 
 // PRIVATE FUNCTIONS
+
+MerchantItem* CreateMerchantItem(StatType type, int price, int points)
+{
+    MerchantItem* item = malloc(sizeof(MerchantItem));
+    item->statType = type;
+    item->price = price;
+    item->points = points;
+    return item;
+}
+
+MerchantItem** CreateMerchantItems()
+{
+    MerchantItem** items = malloc(4 * sizeof(MerchantItem*));
+    items[0] = CreateMerchantItem(STAT_STRENGTH, STRENGTH_BASE_PRICE, 1);
+    items[1] = CreateMerchantItem(STAT_MOVEMENT_SPEED, MOVEMENT_BASE_PRICE, 1);
+    items[2] = CreateMerchantItem(STAT_ATTACK_SPEED, ATTACK_SPEED_BASE_PRICE, 1);
+    items[3] = CreateMerchantItem(STAT_STAMINA, STAMINA_BASE_PRICE, 1);
+    return items;
+}

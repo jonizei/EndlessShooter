@@ -10,8 +10,8 @@ const int MOVEMENT_SPEED_MAX_LEVEL = 10;
 const int ATTACK_SPEED_MAX_LEVEL = 10;
 const int STAMINA_MAX_LEVEL = 10;
 
-const float STRENGTH_FACTOR = 4.0f;
-const float MOVEMENT_SPEED_FACTOR = 0.25f;
+const float STRENGTH_FACTOR = 5.0f;
+const float MOVEMENT_SPEED_FACTOR = 0.10f;
 const float ATTACK_SPEED_FACTOR = 0.1f;
 const float STAMINA_FACTOR = 50;
 

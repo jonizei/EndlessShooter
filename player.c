@@ -20,7 +20,7 @@ const int WIDTH = 16;
 const float BASE_MOVEMENT_SPEED = 1.0f;
 const int BULLET_HEIGHT = 6;
 const int BULLET_WIDTH = 6;
-const float BASE_DAMAGE = 4.0f;
+const float BASE_DAMAGE = 5.0f;
 const float BASE_HEALTH = 100.0f;
 const float BASE_BULLET_SPEED = 5.0f;
 const float BASE_ATTACK_SPEED = 0.1f;
@@ -94,6 +94,8 @@ Player* CreatePlayer(float x, float y, Stats stats)
     p->weapon = CreateWeapon(weaponTexture, WEAPON_WIDTH, WEAPON_HEIGHT, BASE_BULLET_SPEED, p->attackSpeed);
     p->weapon->offset = 6;
 
+    ClearProjectilePool(projectilePool, MAX_PROJECTILE);
+
     free(playerRef);
     playerRef = p;
 
@@ -147,29 +149,11 @@ void TakeDamage(Player* player, float damage)
 
 void UpdatePlayerStats(Player* player)
 {
-    player->health = BASE_HEALTH + GetStatValue(player->stats, STAT_STAMINA);
+    player->maxHealth = BASE_HEALTH + GetStatValue(player->stats, STAT_STAMINA);
+    player->health = player->maxHealth;
     player->movementSpeed = BASE_MOVEMENT_SPEED + GetStatValue(player->stats, STAT_MOVEMENT_SPEED);
     player->attackSpeed = BASE_ATTACK_SPEED + GetStatValue(player->stats, STAT_ATTACK_SPEED);
     player->damage = BASE_DAMAGE + GetStatValue(player->stats, STAT_STRENGTH);
-}
-
-void UpgradePlayerStat(Player* player, StatType statType, int points)
-{
-    switch (statType)
-    {
-        case STAT_STRENGTH:
-            
-            break;
-
-        case STAT_MOVEMENT_SPEED:
-            break;
-
-        case STAT_ATTACK_SPEED:
-            break;
-
-        case STAT_STAMINA:
-            break;
-    }
 }
 
 bool PlayerHasEnoughCoins(Player* player, int amount)
