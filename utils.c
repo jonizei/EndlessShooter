@@ -48,7 +48,6 @@ GameMap* GetGameMap()
     return _GameMapRef;
 }
 
-// TODO: Make sure this function works correctly
 void MyFree(void** ptr)
 {
     free(*ptr);

@@ -13,10 +13,27 @@
 #define SCREEN_HEIGHT 680
 #define FPS 60
 
-#define MAP_COLUMN_COUNT 200
-#define MAP_ROW_COUNT 200
+#define MAP_COLUMN_COUNT 150
+#define MAP_ROW_COUNT 150
 #define MAP_TILE_WIDTH 16   
 #define MAP_TILE_HEIGHT 16
+
+// 1 = start zone
+// 2 = forest zone
+// 3 = mountain zone
+// 4 = swamp zone
+int defaultMapSeed[10][10] = {
+    { 4, 4, 4, 4, 2, 2, 2, 2, 2, 2 },
+    { 4, 4, 4, 4, 2, 2, 2, 2, 2, 2 },
+    { 4, 4, 4, 2, 2, 2, 2, 2, 2, 2 },
+    { 4, 4, 2, 2, 2, 2, 2, 2, 2, 2 },
+    { 3, 2, 2, 2, 2, 1, 1, 2, 2, 2 },
+    { 3, 3, 2, 2, 2, 1, 1, 2, 2, 2 },
+    { 3, 3, 3, 2, 2, 2, 2, 2, 2, 3 },
+    { 3, 3, 3, 3, 2, 2, 2, 2, 3, 3 },
+    { 3, 3, 3, 3, 3, 3, 2, 3, 3, 3 },
+    { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 },
+};
 
 void UpdateCameraPosition(Camera2D* camera, Vector2 target);
 
@@ -36,46 +53,46 @@ int main()
     UILayer* uiLayer = CreateUILayer();
     SetMainUILayer(uiLayer);
 
-    // 1 = start zone
-    // 2 = forest zone
-    // 3 = mountain zone
-    // 4 = swamp zone
-
-    GameMap* gameMap = CreateGameMap(MAP_COLUMN_COUNT, MAP_ROW_COUNT, MAP_TILE_WIDTH, MAP_TILE_HEIGHT);
-
-    int mapSeedBase[10][10] = {
-        { 4, 4, 4, 4, 2, 2, 2, 2, 2, 2 },
-        { 4, 4, 4, 4, 2, 2, 2, 2, 2, 2 },
-        { 4, 4, 4, 2, 2, 2, 2, 2, 2, 2 },
-        { 4, 4, 2, 2, 2, 2, 2, 2, 2, 2 },
-        { 3, 2, 2, 2, 2, 1, 1, 2, 2, 2 },
-        { 3, 3, 2, 2, 2, 1, 1, 2, 2, 2 },
-        { 3, 3, 3, 2, 2, 2, 2, 2, 2, 3 },
-        { 3, 3, 3, 3, 2, 2, 2, 2, 3, 3 },
-        { 3, 3, 3, 3, 3, 3, 2, 3, 3, 3 },
-        { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 },
-    };
-
     int mapSeed[100];
 
     for (int i = 0; i < 10; i++) 
     {
         for (int j = 0; j < 10; j++)
         {   
-            mapSeed[i * 10 + j] = mapSeedBase[i][j];
+            mapSeed[i * 10 + j] = defaultMapSeed[i][j];
         }
     }
 
+    GameMap* gameMap = CreateGameMap(MAP_COLUMN_COUNT, MAP_ROW_COUNT, MAP_TILE_WIDTH, MAP_TILE_HEIGHT);
     Layer mapLayer = CreateMapLayerFromSeed(gameMap, (int*)&mapSeed, 10, 10);
-    AddLayer(gameMap, &mapLayer);
+    AddMapLayer(gameMap, &mapLayer);
     SetGameMap(gameMap);
 
-    Stats playerBaseStats = {1, 1, 1, 1};
-    Vector2 playerStartPosition = GetTileGridTilePosition(gameMap->mapGrid, 5, 5);
+    Stats playerBaseStats = {0, 0, 0, 0};
+    Vector2 playerStartPosition = GetRandomPositionOnArea(gameMap, 1);
     Player* player = CreatePlayer(playerStartPosition.x, playerStartPosition.y, playerBaseStats);
-    EnemySpawner* ratSpawner = CreateEnemySpawer(ENEMY_RAT, 3, 100, 350, 350);
-    EnemySpawner* goblinSpawner = CreateEnemySpawer(ENEMY_GOBLIN, 5, 100, 200, 450);
-    AddMerchant(200, 200);
+
+    Vector2 ratSpawnerPosition = GetRandomPositionOnArea(gameMap, 4);
+    EnemySpawner* ratSpawner1 = CreateEnemySpawer(ENEMY_RAT, 30, 200, ratSpawnerPosition.x, ratSpawnerPosition.y);
+    ratSpawnerPosition = GetRandomPositionOnArea(gameMap, 2);
+    EnemySpawner* ratSpawner2 = CreateEnemySpawer(ENEMY_RAT, 30, 200, ratSpawnerPosition.x, ratSpawnerPosition.y);
+    ratSpawnerPosition = GetRandomPositionOnArea(gameMap, 2);
+    EnemySpawner* ratSpawner3 = CreateEnemySpawer(ENEMY_RAT, 30, 200, ratSpawnerPosition.x, ratSpawnerPosition.y);
+
+    Vector2 goblinSpawnerPosition = GetRandomPositionOnArea(gameMap, 2);
+    EnemySpawner* goblinSpawner1 = CreateEnemySpawer(ENEMY_GOBLIN, 30, 200, goblinSpawnerPosition.x, goblinSpawnerPosition.y);
+    goblinSpawnerPosition = GetRandomPositionOnArea(gameMap, 2);
+    EnemySpawner* goblinSpawner2 = CreateEnemySpawer(ENEMY_GOBLIN, 30, 200, goblinSpawnerPosition.x, goblinSpawnerPosition.y);
+
+
+    Vector2 merchantPosition = GetRandomPositionOnArea(gameMap, 1);
+    AddMerchant(merchantPosition.x, merchantPosition.y);
+    merchantPosition = GetRandomPositionOnArea(gameMap, 2);
+    AddMerchant(merchantPosition.x, merchantPosition.y);
+    merchantPosition = GetRandomPositionOnArea(gameMap, 3);
+    AddMerchant(merchantPosition.x, merchantPosition.y);
+    merchantPosition = GetRandomPositionOnArea(gameMap, 4);
+    AddMerchant(merchantPosition.x, merchantPosition.y);
 
     Camera2D camera = {0};
     camera.target = GetOrigin(player->transform);
@@ -88,13 +105,21 @@ int main()
     while(!WindowShouldClose())
     {
         UpdateCameraPosition(&camera, GetOrigin(player->transform));
-        UpdatePlayer(player);
-        CheckEnemyCollision();
-        CheckPlayerCollisionWithCoins(player);
-        UpdateEnemies();
-        UpdateSpawner(ratSpawner);
-        UpdateSpawner(goblinSpawner);
         UpdateUILayer(uiLayer);
+
+        // Pause game if UI is open
+        if (!IsUIOpen())
+        {
+            UpdatePlayer(player);
+            CheckEnemyCollision();
+            CheckPlayerCollisionWithCoins(player);
+            UpdateEnemies();
+            UpdateSpawner(ratSpawner1);
+            UpdateSpawner(ratSpawner2);
+            UpdateSpawner(ratSpawner3);
+            UpdateSpawner(goblinSpawner1);
+            UpdateSpawner(goblinSpawner2);
+        }
 
         BeginDrawing();
 
@@ -115,8 +140,11 @@ int main()
         EndDrawing();
     }
 
-    FreeEnemySpawner(goblinSpawner);
-    FreeEnemySpawner(ratSpawner);
+    FreeEnemySpawner(ratSpawner1);
+    FreeEnemySpawner(ratSpawner2);
+    FreeEnemySpawner(ratSpawner3);
+    FreeEnemySpawner(goblinSpawner1);
+    FreeEnemySpawner(goblinSpawner2);
     FreeEnemies();
     FreePlayer(player);
     FreeGameMap(gameMap);

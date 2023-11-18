@@ -18,6 +18,7 @@ TileGrid* CreateTileGrid(int x, int y, int width, int height, float tileWidth, f
 void FreeTileGrid(TileGrid* grid);
 void DrawTileGrid(TileGrid* grid);
 Rectangle* GetTileGridTile(TileGrid* grid, float x, float y);
+Rectangle GetTileGridTileByCoordinates(TileGrid* grid, int x, int y);
 Vector2 GetTileGridTilePosition(TileGrid* grid, int x, int y);
 
 #endif

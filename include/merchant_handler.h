@@ -12,5 +12,6 @@ void DrawMerchants();
 void FreeMerchants();
 Merchant* FindMerchantInRadius(Vector2 position, float radius);
 void InteractMerchant(Merchant* merchant);
+void UpdateMerchantItemOnAllMerchants(StatType statType, int points);
 
 #endif

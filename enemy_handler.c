@@ -20,9 +20,9 @@ void RemoveFromEnemyPool(int id);
 
 // PUBLIC FUNCTIONS
 
-void SpawnEnemy(EnemyType type, int x, int y)
+void SpawnEnemy(EnemySpawner* spawner, int x, int y)
 {
-    Enemy* enemy = CreateEnemyByType(type, enemyId, x, y);
+    Enemy* enemy = CreateEnemyByType(spawner->enemyType, enemyId, x, y);
     AddToEnemyPool(enemy);
     enemyId++;
 }
@@ -100,11 +100,11 @@ void FreeEnemySpawner(EnemySpawner* spawner)
 
 void UpdateSpawner(EnemySpawner* spawner)
 {
-    if (GetTime() - spawner->lastSpawn > spawner->spawnTime)
+    if (GetTime() - spawner->lastSpawn > spawner->spawnTime && (enemyCount + 1) < MAX_ENEMY)
     {
         int x = GetRandomValue(spawner->transform.position.x, spawner->transform.position.x + spawner->transform.size.x);
         int y = GetRandomValue(spawner->transform.position.y, spawner->transform.position.y + spawner->transform.size.y);
-        SpawnEnemy(spawner->enemyType, x, y);
+        SpawnEnemy(spawner, x, y);
         spawner->lastSpawn = GetTime();
     }
 }

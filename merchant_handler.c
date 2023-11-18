@@ -71,4 +71,15 @@ void InteractMerchant(Merchant* merchant)
     OpenMerchantUI(GetMainUILayer(), merchant);
 }
 
+void UpdateMerchantItemOnAllMerchants(StatType statType, int points)
+{
+    for (int i = 0; i < MAX_MERCHANT; i++)
+    {
+        if (merchantPool[i] != NULL) 
+        {
+            UpdateMerchantItem(merchantPool[i], statType, points);
+        }
+    }
+}
+
 // PRIVATE FUNCTIONS

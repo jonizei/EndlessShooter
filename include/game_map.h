@@ -22,9 +22,10 @@ typedef struct _game_map {
 
 GameMap* CreateGameMap(int width, int height, float tileWidth, float tileHeight);
 Layer CreateMapLayerFromSeed(GameMap* gameMap, int* seed, size_t rows, size_t cols);
+Vector2 GetRandomPositionOnArea(GameMap* gameMap, int areaType);
 void FreeGameMap(GameMap* gameMap);
 void DrawGameMap(GameMap* gameMap);
-void AddLayer(GameMap* gameMap, Layer* layer);
+void AddMapLayer(GameMap* gameMap, Layer* layer);
 void LoadGameMapResources();
 void UnloadGameMapResources();
 

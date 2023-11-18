@@ -11,7 +11,7 @@ typedef struct _enemy_spawner {
     double lastSpawn;
 } EnemySpawner;
 
-void SpawnEnemy(EnemyType type, int x, int y);
+void SpawnEnemy(EnemySpawner* spawner, int x, int y);
 void DrawEnemies();
 void CheckEnemyCollision();
 void UpdateEnemies();

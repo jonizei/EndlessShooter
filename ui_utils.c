@@ -4,6 +4,7 @@
 #include "include/player.h"
 #include "include/raymath.h"
 #include "include/merchant.h"
+#include "include/merchant_handler.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdbool.h>
@@ -438,7 +439,7 @@ void ClickMerchantUIButton(MerchantUI* merchantUi, MerchantUIButton* merchantBut
         PlayerSpentCoins(player, merchantButton->price);
         UpdateStatPoint(&(player->stats), merchantButton->statType, merchantButton->points);
         UpdatePlayerStats(player);
-        UpdateMerchantItem(merchantUi->activeMerchant, merchantButton->statType, merchantButton->points);
+        UpdateMerchantItemOnAllMerchants(merchantButton->statType, merchantButton->points);
         UpdateMerchantUIButtons(merchantUi);
     }
 }

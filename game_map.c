@@ -25,10 +25,12 @@ int layerCount = 0;
 
 // PRIVATE FUNCTION DECLARATIONS
 Texture2D* CreateGameMapTextures(GameMap* gameMap);
-Layer FlattenLayers(GameMap* gameMap);
-void MergeLayers(Layer* a, Layer* b);
+Layer FlattenMapLayers(GameMap* gameMap);
+void MergeMapLayers(Layer* a, Layer* b);
 Texture2D GetTextureByType(GameMap* gameMap, int type);
 int* ScaleSeed(int* seed, size_t rows, size_t cols, int xScale, int yScale);
+void FindTileGridTilesByAreaType(GameMap* gameMap, int areaType, Rectangle** dest, size_t* size);
+size_t CountTileGridTilesByAreaType(GameMap* gameMap, int areaType);
 
 // PUBLIC FUNCTIONS
 
@@ -91,6 +93,25 @@ Layer CreateMapLayerFromSeed(GameMap* gameMap, int* seed, size_t rows, size_t co
     return layer;
 }
 
+Vector2 GetRandomPositionOnArea(GameMap* gameMap, int areaType)
+{
+    Vector2 position = {0, 0};
+
+    size_t size = gameMap->mapGrid->height * gameMap->mapGrid->width;
+    Rectangle* tiles;
+    FindTileGridTilesByAreaType(gameMap, areaType, &tiles, &size);
+    int randomIndex = GetRandomValue(0, size-1);
+
+    position = (Vector2){
+        tiles[randomIndex].x,
+        tiles[randomIndex].y
+    };
+
+    free(tiles);
+
+    return position;
+}
+
 void FreeGameMap(GameMap* gameMap)
 {
     FreeTileGrid(gameMap->mapGrid);
@@ -101,7 +122,7 @@ void FreeGameMap(GameMap* gameMap)
 
 void DrawGameMap(GameMap* gameMap)
 {
-    Layer flattenLayer = FlattenLayers(gameMap);
+    Layer flattenLayer = FlattenMapLayers(gameMap);
     for (int i = 0; i < gameMap->mapGrid->height; i++)
     {
         for (int j = 0; j < gameMap->mapGrid->width; j++)
@@ -114,7 +135,7 @@ void DrawGameMap(GameMap* gameMap)
     }
 }
 
-void AddLayer(GameMap* gameMap, Layer* layer)
+void AddMapLayer(GameMap* gameMap, Layer* layer)
 {
     bool hasSameHeight = gameMap->mapGrid->height == layer->height;
     bool hasSameWidth = gameMap->mapGrid->width == layer->width;
@@ -140,7 +161,7 @@ Texture2D* CreateGameMapTextures(GameMap* gameMap)
     return textures;
 }
 
-Layer FlattenLayers(GameMap* gameMap)
+Layer FlattenMapLayers(GameMap* gameMap)
 {
     Layer flattenLayer;
     flattenLayer.height = gameMap->mapGrid->height;
@@ -151,13 +172,13 @@ Layer FlattenLayers(GameMap* gameMap)
     for (int i = 0; i < layerCount; i++) 
     {
         Layer layer = gameMap->layers[i];
-        MergeLayers(&flattenLayer, &layer);
+        MergeMapLayers(&flattenLayer, &layer);
     }
 
     return flattenLayer;
 }
 
-void MergeLayers(Layer* a, Layer* b)
+void MergeMapLayers(Layer* a, Layer* b)
 {
     for (int i = 0; i < a->height; i++)
     {
@@ -226,4 +247,48 @@ int* ScaleSeed(int* seed, size_t rows, size_t cols, int xScale, int yScale)
     }
 
     return scaledSeed;
+}
+
+void FindTileGridTilesByAreaType(GameMap* gameMap, int areaType, Rectangle** dest, size_t* size)
+{
+    size_t tileCount = CountTileGridTilesByAreaType(gameMap, areaType);
+    if (tileCount <= *size)
+    {
+        *size = tileCount;
+    }
+
+    Rectangle* tiles = malloc(*size * sizeof(Rectangle));
+
+    int tileIndex = 0;
+    Layer flatLayer = FlattenMapLayers(gameMap);
+    for (int i = 0; i < flatLayer.height; i++)
+    {
+        for (int j = 0; j < flatLayer.width; j++)
+        {
+            int index = i * flatLayer.width + j;
+            if (flatLayer.layout[index] == areaType && tileIndex < *size-1)
+            {
+                tiles[tileIndex] = GetTileGridTileByCoordinates(gameMap->mapGrid, j, i);
+                tileIndex++;
+            }
+        }
+    }
+
+    *dest = tiles;
+}
+
+size_t CountTileGridTilesByAreaType(GameMap* gameMap, int areaType)
+{
+    const int maxTileCount = gameMap->mapGrid->height * gameMap->mapGrid->width;
+    Layer flatLayer = FlattenMapLayers(gameMap);
+    size_t count = 0;
+    for (int i = 0; i < maxTileCount; i++)
+    {
+        if (flatLayer.layout[i] == areaType)
+        {
+            count++;
+        }
+    }
+
+    return count;
 }

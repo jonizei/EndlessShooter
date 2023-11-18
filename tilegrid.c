@@ -68,6 +68,19 @@ Rectangle* GetTileGridTile(TileGrid* grid, float x, float y)
     return foundTile;
 }
 
+Rectangle GetTileGridTileByCoordinates(TileGrid* grid, int x, int y)
+{
+    bool xInside = x >= 0 && x < grid->width;
+    bool yInside = y >= 0 && y < grid->height;
+
+    if (xInside && yInside)
+    {
+        return grid->matrix[y][x];
+    }
+
+    return (Rectangle){ 0, 0, 0, 0 };
+}
+
 Vector2 GetTileGridTilePosition(TileGrid* grid, int x, int y)
 {
     if (x > grid->width || y > grid->height) 
