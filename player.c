@@ -18,15 +18,15 @@ const int BUTTON_RIGHT = KEY_D;
 const int HEIGHT = 16;
 const int WIDTH = 16;
 const float BASE_MOVEMENT_SPEED = 1.1f;
-const int BULLET_HEIGHT = 6;
-const int BULLET_WIDTH = 6;
+const int BULLET_HEIGHT = 4.0f;
+const int BULLET_WIDTH = 6.0f;
 const float BASE_DAMAGE = 5.0f;
 const float BASE_HEALTH = 100.0f;
 const float BASE_BULLET_SPEED = 5.0f;
 const float BASE_ATTACK_SPEED = 0.1f;
 const float INTERACT_RADIUS = 32.0f;
-const int WEAPON_WIDTH = 12;
-const int WEAPON_HEIGHT = 12;
+const int WEAPON_WIDTH = 10;
+const int WEAPON_HEIGHT = 14;
 
 // GLOBAL VARIBLES
 Projectile* projectilePool[MAX_PROJECTILE];
@@ -55,7 +55,7 @@ void PlayerInteract(Player* player);
 void LoadPlayerResources()
 {
     playerImage = LoadImage("resources/textures/player_sprite.png");
-    bulletImage = LoadImage("resources/textures/bullet_sprite.png");
+    bulletImage = LoadImage("resources/textures/bullet03_sprite.png");
     weaponImage = LoadImage("resources/textures/gun_sprite.png");
 
     playerTexture = LoadTextureFromImage(playerImage);
@@ -243,7 +243,7 @@ void ShootPlayer(Player* player)
             bullet->transform.rotation = mouseAngle;
             bullet->damage = player->damage;
 
-            Vector2 offsetPosition = GetOffsetPositionInDistance(player->weapon->barrelPoint, bullet->transform.size.y / 2, 1, degToRad(mouseAngle));
+            Vector2 offsetPosition = GetOffsetPositionInDistance(player->weapon->barrelPoint, bullet->transform.size.y / 2, 0.1f, degToRad(mouseAngle));
             bullet->transform.position = offsetPosition;
 
             bool success = AddToProjectilePool(projectilePool, bullet, MAX_PROJECTILE);
@@ -299,7 +299,7 @@ void MoveWeapon(Player* player)
         player->weapon->flipped = false;
     }
 
-    float distance = player->weapon->offset + weaponWidth;
+    float distance = player->weapon->offset + weaponWidth - 6;
     player->weapon->barrelPoint = GetPositionInDistance(playerOrigin, distance, degToRad(mouseAngle));
 }
 

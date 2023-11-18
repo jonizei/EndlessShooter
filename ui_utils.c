@@ -32,9 +32,18 @@ typedef struct _ui_coins {
     int count;
 } UICoins;
 
+typedef struct _ui_loadingbar {
+    Transform2D transform;
+    Texture2D background;
+    Texture2D fill;
+    Texture2D border;
+    float fillValue;
+} UILoadingbar;
+
 typedef struct _player_ui {
     UIHealthbar* healthbar;
     UICoins* coins;
+    UILoadingbar* cooldownbar;
 } PlayerUI;
 
 typedef struct _ui_button {
@@ -77,6 +86,9 @@ Image merchantBackground;
 Image merchantBtnBackground;
 Image merchantBtnDownBackground;
 Image merchantExitBtnBackground;
+Image cooldownbarBackground;
+Image cooldownbarBorder;
+Image cooldownbarFill;
 Texture2D merchantBtnTexture;
 Texture2D merchantBtnDownTexture;
 Texture2D merchantExitBtnTexture;
@@ -104,6 +116,9 @@ void FreeMerchantUIButton(MerchantUIButton* merchantButton);
 void UpdateMerchantUI(MerchantUI* merchantUi);
 void ClickMerchantUIButton(MerchantUI* merchantUi, MerchantUIButton* merchantButton);
 void UpdateMerchantUIButtons(MerchantUI* merchantUi);
+UILoadingbar* CreateUILoadingbar(Texture2D border, Texture2D fill, Texture2D background, float x, float y, float width, float height);
+void DrawUILoadingbar(UILoadingbar* loadingbar);
+void DrawUILoadingbarFill(UILoadingbar* loadingbar);
 
 // PUBLIC FUNCTIONS
 void LoadUIResources()
@@ -116,6 +131,9 @@ void LoadUIResources()
     merchantBtnBackground = LoadImage("resources/textures/ui/merchant_menu_btn_sprite.png");
     merchantBtnDownBackground = LoadImage("resources/textures/ui/merchant_menu_btn_down_sprite.png");
     merchantExitBtnBackground = LoadImage("resources/textures/ui/merchant_menu_exit_btn_sprite.png");
+    cooldownbarBackground = LoadImage("resources/textures/ui/progressbar01_background_sprite.png");
+    cooldownbarBorder = LoadImage("resources/textures/ui/progressbar01_border_sprite.png");
+    cooldownbarFill = LoadImage("resources/textures/ui/progressbar01_fill_sprite.png");
 
     merchantBtnTexture = LoadTextureFromImage(merchantBtnBackground);
     merchantBtnDownTexture = LoadTextureFromImage(merchantBtnDownBackground);
@@ -132,6 +150,9 @@ void UnloadUIResources()
     UnloadImage(merchantBtnBackground);
     UnloadImage(merchantBtnDownBackground);
     UnloadImage(merchantExitBtnBackground);
+    UnloadImage(cooldownbarBackground);
+    UnloadImage(cooldownbarBorder);
+    UnloadImage(cooldownbarFill);
 }
 
 bool IsUIOpen()
@@ -255,9 +276,20 @@ void DrawUICoins(UICoins* uiCoins)
 
 PlayerUI* CreatePlayerUI()
 {
+    float cooldownbarWidth = GetScreenWidth() - 64;
+
     PlayerUI* playerUi = (PlayerUI*)malloc(sizeof(PlayerUI));
     playerUi->healthbar = CreateUIHealthbar(10, 10);
     playerUi->coins = CreateUICoins(10, 52);
+    playerUi->cooldownbar = CreateUILoadingbar(
+        LoadTextureFromImage(cooldownbarBorder),
+        LoadTextureFromImage(cooldownbarFill),
+        LoadTextureFromImage(cooldownbarBackground),
+        32,
+        GetScreenHeight() - 24,
+        cooldownbarWidth,
+        8
+    );
     return playerUi;
 }
 
@@ -278,6 +310,8 @@ void UpdatePlayerUI(PlayerUI* playerUi)
         }
 
         playerUi->healthbar->fillValue = fillValue;
+        float elapsedTime = GetTime() - player->weapon->lastShot;
+        playerUi->cooldownbar->fillValue = elapsedTime / player->attackSpeed > 1.0f ? 1.0f : elapsedTime / player->attackSpeed;
     }
 }
 
@@ -285,12 +319,14 @@ void DrawPlayerUI(PlayerUI* playerUi)
 {
     DrawUIHealthbar(playerUi->healthbar);
     DrawUICoins(playerUi->coins);
+    DrawUILoadingbar(playerUi->cooldownbar);
 }
 
 void FreePlayerUI(PlayerUI* playerUi)
 {
     free(playerUi->healthbar);
     free(playerUi->coins);
+    free(playerUi->cooldownbar);
     MyFree((void**)(&playerUi));
 }
 
@@ -532,4 +568,35 @@ void DrawUIButton(UIButton* uiButton)
 void FreeUIButton(UIButton* uiButton)
 {
     MyFree((void**)&uiButton);
+}
+
+UILoadingbar* CreateUILoadingbar(Texture2D border, Texture2D fill, Texture2D background, float x, float y, float width, float height)
+{
+    UILoadingbar* loadingbar = malloc(sizeof(UILoadingbar));
+    loadingbar->transform.position.x = x;
+    loadingbar->transform.position.y = y;
+    loadingbar->transform.size.x = width;
+    loadingbar->transform.size.y = height;
+    loadingbar->border = border;
+    loadingbar->fill = fill;
+    loadingbar->background = background;
+    loadingbar->fillValue = 1.0f;
+
+    return loadingbar;
+}
+
+void DrawUILoadingbar(UILoadingbar* loadingbar)
+{
+    DrawTextureBySize(loadingbar->background, loadingbar->transform.position, loadingbar->transform.size, 0, false, false);
+    DrawUILoadingbarFill(loadingbar);
+    DrawTextureBySize(loadingbar->border, loadingbar->transform.position, loadingbar->transform.size, 0, false, false);
+}
+
+void DrawUILoadingbarFill(UILoadingbar* loadingbar)
+{
+    Vector2 size = {
+        loadingbar->transform.size.x * loadingbar->fillValue,
+        loadingbar->transform.size.y
+    };
+    DrawTextureBySize(loadingbar->fill, loadingbar->transform.position, size, 0, false, false);
 }

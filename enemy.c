@@ -17,10 +17,14 @@ const float ENEMY_BULLET_SPEED = 1.5f;
 int enemyProjectileId = 1;
 Image ratEnemyImage;
 Image enemyBulletImage;
+Image enemyBulletImage2;
 Image goblinEnemyImage;
+Image eliteGoblinEnemyImage;
 Texture2D ratEnemyTexture;
 Texture2D goblinEnemyTexture;
 Texture2D enemyBulletTexture;
+Texture2D eliteGoblinEnemyTexture;
+Texture2D enemyBulletTexture2;
 
 // PRIVATE FUNCTION DECLARATIONS
 Enemy* CreateEnemy(int id, int x, int y, int width, int height);
@@ -45,10 +49,14 @@ void LoadEnemyResources()
     ratEnemyImage = LoadImage("resources/textures/rat_enemy_sprite.png");
     enemyBulletImage = LoadImage("resources/textures/bullet_sprite.png");
     goblinEnemyImage = LoadImage("resources/textures/goblin_enemy_sprite.png");
+    eliteGoblinEnemyImage = LoadImage("resources/textures/elite_goblin_enemy_sprite.png");
+    enemyBulletImage2 = LoadImage("resources/textures/bullet02_sprite.png");
 
     ratEnemyTexture = LoadTextureFromImage(ratEnemyImage);
     goblinEnemyTexture = LoadTextureFromImage(goblinEnemyImage);
     enemyBulletTexture = LoadTextureFromImage(enemyBulletImage);
+    eliteGoblinEnemyTexture = LoadTextureFromImage(eliteGoblinEnemyImage);
+    enemyBulletTexture2 = LoadTextureFromImage(enemyBulletImage2);
 }
 
 void UnloadEnemyResources()
@@ -56,6 +64,8 @@ void UnloadEnemyResources()
     UnloadImage(ratEnemyImage);
     UnloadImage(enemyBulletImage);
     UnloadImage(goblinEnemyImage);
+    UnloadImage(eliteGoblinEnemyImage);
+    UnloadImage(enemyBulletImage2);
 }
 
 Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
@@ -72,6 +82,8 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
     float wanderTargetTime = 5.0;
     float movementSpeed = 1.0f;
     Texture2D texture;
+    Texture2D bulletTexture;
+    float bulletSpeed = ENEMY_BULLET_SPEED;
     float hitAreaWidth = 1.0f;
     float hitAreaHeight = 1.0f;
     int coinDropMin = 1;
@@ -103,16 +115,46 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
             attackSpeed = 1.8f;
             movementSpeed = 0.7f;
             texture = goblinEnemyTexture;
+            bulletTexture = enemyBulletTexture;
             defaultMovementState = ENEMY_STATE_WANDER;
             attackType = ENEMY_ATTACK_SHOOT;
             coinDropMin = 2;
             coinDropMax = 4;
         break;
 
-    }
+        case ENEMY_ELITE_GOBLIN:
+            width = 16;
+            height = 16;
+            health = 80.0f;
+            damage = 12.0f;
+            attackSpeed = 1.4f;
+            movementSpeed = 0.9f;
+            texture = eliteGoblinEnemyTexture;
+            bulletTexture = enemyBulletTexture2;
+            bulletSpeed = 2.0f;
+            defaultMovementState = ENEMY_STATE_WANDER;
+            attackType = ENEMY_ATTACK_SHOOT;
+            coinDropMin = 5;
+            coinDropMax = 10;
+        break;
 
-    float enemyArea = width * height;
-    float textureArea = texture.height * texture.width;
+        case ENEMY_GIANT_RAT:
+            width = 24;
+            height = 24;
+            health = 200.0f;
+            damage = 20.0f;
+            attackSpeed = 1.5f;
+            movementSpeed = 1.1f;
+            defaultMovementState = ENEMY_STATE_WANDER;
+            attackType = ENEMY_ATTACK_HIT;
+            texture = ratEnemyTexture;
+            hitAreaHeight = 20.0f;
+            hitAreaWidth = width * 1.5f;
+            coinDropMin = 15;
+            coinDropMax = 20;
+        break;
+
+    }
 
     Enemy* enemy = CreateEnemy(id, x, y, width, height);
     enemy->type = type;
@@ -128,7 +170,8 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
     enemy->wanderRadius = wanderRadius;
     enemy->wanderTargetTime = wanderTargetTime;
     enemy->texture = texture;
-    enemy->transform.scale = enemyArea / textureArea;
+    enemy->bulletTexture = bulletTexture;
+    enemy->bulletSpeed = bulletSpeed;
     enemy->coinDropMin = coinDropMin;
     enemy->coinDropMax = coinDropMax;
 
@@ -145,7 +188,7 @@ Enemy* CreateEnemyByType(EnemyType type, int id, int x, int y)
 
 void DrawEnemy(Enemy* enemy)
 {
-    DrawTextureEx(enemy->texture, enemy->transform.position, 0, enemy->transform.scale, WHITE);
+    DrawTextureBySize(enemy->texture, enemy->transform.position, enemy->transform.size, enemy->transform.rotation, false, false);
     
     // Used only for debugging
     //DrawBox2D(enemy->hitArea);
@@ -193,6 +236,7 @@ Enemy* CreateEnemy(int id, int x, int y, int width, int height)
     enemy->id = id;
     enemy->transform.position.x = x;
     enemy->transform.position.y = y;
+    enemy->transform.rotation = 0;
     enemy->startPosition.x = x;
     enemy->startPosition.y = y;
     enemy->transform.size.x = width;
@@ -342,13 +386,15 @@ void EnemyShootAttack(Enemy* enemy)
 {
     if (IsPlayerInRange(enemy, GetPlayer())) 
     {
+        Vector2 enemyOrigin = GetOrigin(enemy->transform);
+
         Projectile* bullet = CreateProjectile(
-            enemyBulletTexture
-            , enemy->transform.position.x
-            , enemy->transform.position.y
+            enemy->bulletTexture
+            , enemyOrigin.x
+            , enemyOrigin.y
             , ENEMY_BULLET_WIDTH
             , ENEMY_BULLET_HEIGHT
-            , ENEMY_BULLET_SPEED
+            , enemy->bulletSpeed
             , 0
         );
 

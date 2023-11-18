@@ -9,7 +9,9 @@
 
 typedef enum {
     ENEMY_RAT,
-    ENEMY_GOBLIN
+    ENEMY_GOBLIN,
+    ENEMY_ELITE_GOBLIN,
+    ENEMY_GIANT_RAT
 } EnemyType;
 
 typedef enum {
@@ -32,6 +34,8 @@ typedef struct _enemy {
     Vector2 startPosition;
     Texture2D texture;
     Projectile* projectilePool[MAX_ENEMY_PROJECTILE];
+    Texture2D bulletTexture;
+    float bulletSpeed;
     float health;
     float damage;
     float attackSpeed;

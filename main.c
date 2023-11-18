@@ -79,11 +79,18 @@ int main()
     ratSpawnerPosition = GetRandomPositionOnArea(gameMap, 2);
     EnemySpawner* ratSpawner3 = CreateEnemySpawer(ENEMY_RAT, 30, 200, ratSpawnerPosition.x, ratSpawnerPosition.y);
 
+    ratSpawnerPosition = GetRandomPositionOnArea(gameMap, 4);
+    EnemySpawner* giantRatSpawner = CreateEnemySpawer(ENEMY_GIANT_RAT, 180, 200, ratSpawnerPosition.x, ratSpawnerPosition.y);
+
     Vector2 goblinSpawnerPosition = GetRandomPositionOnArea(gameMap, 2);
     EnemySpawner* goblinSpawner1 = CreateEnemySpawer(ENEMY_GOBLIN, 30, 200, goblinSpawnerPosition.x, goblinSpawnerPosition.y);
     goblinSpawnerPosition = GetRandomPositionOnArea(gameMap, 2);
     EnemySpawner* goblinSpawner2 = CreateEnemySpawer(ENEMY_GOBLIN, 30, 200, goblinSpawnerPosition.x, goblinSpawnerPosition.y);
 
+    goblinSpawnerPosition = GetRandomPositionOnArea(gameMap, 3);
+    EnemySpawner* eliteGoblinSpawner = CreateEnemySpawer(ENEMY_ELITE_GOBLIN, 50, 200, goblinSpawnerPosition.x, goblinSpawnerPosition.y);
+    goblinSpawnerPosition = GetRandomPositionOnArea(gameMap, 3);
+    EnemySpawner* eliteGoblinSpawner2 = CreateEnemySpawer(ENEMY_ELITE_GOBLIN, 50, 200, goblinSpawnerPosition.x, goblinSpawnerPosition.y);
 
     Vector2 merchantPosition = GetRandomPositionOnArea(gameMap, 1);
     AddMerchant(merchantPosition.x, merchantPosition.y);
@@ -117,8 +124,11 @@ int main()
             UpdateSpawner(ratSpawner1);
             UpdateSpawner(ratSpawner2);
             UpdateSpawner(ratSpawner3);
+            UpdateSpawner(giantRatSpawner);
             UpdateSpawner(goblinSpawner1);
             UpdateSpawner(goblinSpawner2);
+            UpdateSpawner(eliteGoblinSpawner);
+            UpdateSpawner(eliteGoblinSpawner2);
         }
 
         BeginDrawing();
@@ -143,8 +153,12 @@ int main()
     FreeEnemySpawner(ratSpawner1);
     FreeEnemySpawner(ratSpawner2);
     FreeEnemySpawner(ratSpawner3);
+    FreeEnemySpawner(giantRatSpawner);
     FreeEnemySpawner(goblinSpawner1);
     FreeEnemySpawner(goblinSpawner2);
+    FreeEnemySpawner(eliteGoblinSpawner);
+    FreeEnemySpawner(eliteGoblinSpawner2);
+
     FreeEnemies();
     FreePlayer(player);
     FreeGameMap(gameMap);
